@@ -13,16 +13,14 @@ class SideMenu extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-            ),
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
                 'Boards',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: 26,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -53,18 +51,23 @@ class _BoardListViewState extends State<BoardListView> {
             child = ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
+                final MaterialColor primaryColor =
+                    Theme.of(context).colorScheme.primary as MaterialColor;
+                final shade = 500 + Random().nextInt(4) * 100;
                 final board = snapshot.data![index];
                 final boardName = board.name;
                 final boardTitle = board.title;
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Colors
-                        .primaries[Random().nextInt(Colors.primaries.length)],
+                    backgroundColor: primaryColor[shade],
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Text('/$boardName/'),
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          '/$boardName/',
+                          style: const TextStyle(fontWeight: FontWeight.w900),
+                        ),
                       ),
                     ),
                   ),

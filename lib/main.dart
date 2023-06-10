@@ -40,9 +40,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        title: Text(widget.title),
+        foregroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          widget.title,
+        ),
       ),
       drawer: const SideMenu(),
       body: const Center(
