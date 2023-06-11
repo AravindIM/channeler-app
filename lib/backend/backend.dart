@@ -6,6 +6,7 @@ Map<String, String> url = {'boards': 'https://a.4cdn.org/boards.json'};
 
 class Backend {
   late List<Board> boards = [];
+
   Future<List<Board>> fetchBoards() async {
     try {
       if (boards.isEmpty) {
@@ -21,5 +22,11 @@ class Backend {
     } catch (e) {
       return Future.error(e.toString());
     }
+  }
+
+  Board findBoardByName(String name) {
+    final board = boards.firstWhere((board) => board.name == name,
+        orElse: (() => const Board(name: '', title: '')));
+    return board;
   }
 }

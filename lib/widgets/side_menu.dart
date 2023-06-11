@@ -3,16 +3,21 @@ import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class SideMenu extends StatelessWidget {
-  const SideMenu({super.key});
+  const SideMenu({super.key, required this.currentBoard});
+  final String currentBoard;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Drawer(
+      surfaceTintColor: colorScheme.background,
       child: Column(
         children: [
           DrawerHeader(
+            decoration: BoxDecoration(color: colorScheme.background),
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
@@ -25,7 +30,9 @@ class SideMenu extends StatelessWidget {
               ),
             ),
           ),
-          const BoardListView()
+          BoardListView(
+            currentBoard: currentBoard,
+          )
         ],
       ),
     );
@@ -33,7 +40,8 @@ class SideMenu extends StatelessWidget {
 }
 
 class BoardListView extends StatefulWidget {
-  const BoardListView({super.key});
+  const BoardListView({super.key, required this.currentBoard});
+  final String currentBoard;
 
   @override
   State<BoardListView> createState() => _BoardListViewState();
@@ -51,13 +59,18 @@ class _BoardListViewState extends State<BoardListView> {
             child = ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
+                final colorScheme = Theme.of(context).colorScheme;
                 final MaterialColor primaryColor =
-                    Theme.of(context).colorScheme.primary as MaterialColor;
+                    colorScheme.primary as MaterialColor;
                 final shade = 500 + Random().nextInt(4) * 100;
                 final board = snapshot.data![index];
                 final boardName = board.name;
                 final boardTitle = board.title;
+                final bool isSelected = boardName == widget.currentBoard;
                 return ListTile(
+                  selected: isSelected,
+                  selectedColor: colorScheme.onBackground,
+                  selectedTileColor: primaryColor.shade100,
                   leading: CircleAvatar(
                     backgroundColor: primaryColor[shade],
                     child: FittedBox(
@@ -73,7 +86,8 @@ class _BoardListViewState extends State<BoardListView> {
                   ),
                   title: Text(boardTitle),
                   onTap: () {
-                    Navigator.pop(context);
+                    context.go('/board/$boardName');
+                    context.pop();
                   },
                 );
               },
