@@ -9,6 +9,7 @@ jobs:
   release:
     name: Release APK
     runs-on: ubuntu-latest
+    permissions: write-all
 
     strategy:
       matrix:
