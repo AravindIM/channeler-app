@@ -33,6 +33,8 @@ dependencies:
     sdk: flutter
   go_router: ^8.0.1
   http: ^1.0.0
+  infinite_scroll_pagination: ^3.2.0
+  intl: ^0.18.1
   provider: ^6.0.5
 
 dev_dependencies:

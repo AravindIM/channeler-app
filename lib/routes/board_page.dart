@@ -1,4 +1,5 @@
 import 'package:channeler/backend/backend.dart';
+import 'package:channeler/widgets/feed.dart';
 import 'package:channeler/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,19 +23,7 @@ class _BoardPageState extends State<BoardPage> {
         title: Text('/${widget.name}/ - $title'),
       ),
       drawer: SideMenu(currentBoard: widget.name),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(30),
-              child: Text(
-                'Welcome to /${widget.name}/. Home of $title discussions!',
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: Feed(backend: backend, boardName: widget.name),
     );
   }
 }

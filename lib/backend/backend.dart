@@ -1,17 +1,18 @@
+import 'package:channeler/backend/api_endpoint.dart';
 import 'package:channeler/backend/board.dart';
+import 'package:channeler/backend/thread.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-Map<String, String> url = {'boards': 'https://a.4cdn.org/boards.json'};
-
 class Backend {
-  late List<Board> boards = [];
+  List<Board> boards = [];
+  final ApiEndpoint api = ApiEndpoint.for4chan();
 
   Future<List<Board>> fetchBoards() async {
     try {
       if (boards.isEmpty) {
-        final response = await http.get(Uri.parse(url['boards']!),
-            headers: {'Accept': 'application/json'});
+        final response = await http
+            .get(api.getBoardsUri(), headers: {'Accept': 'application/json'});
         if (response.statusCode == 200) {
           boards = await compute(parseBoards, response.body);
         } else {
@@ -25,8 +26,39 @@ class Backend {
   }
 
   Board findBoardByName(String name) {
-    final board = boards.firstWhere((board) => board.name == name,
-        orElse: (() => const Board(name: '', title: '')));
+    final board = boards.firstWhere((board) => board.name == name);
     return board;
+  }
+
+  Future<List<Thread>> fetchThread(String boardName, String id) async {
+    List<Thread> threads = [];
+    try {
+      final response = await http.get(api.getThreadUri(boardName, id),
+          headers: {'Accept': 'application/json'});
+      if (response.statusCode == 200) {
+        threads = await compute(parseThreads, response.body);
+      } else {
+        return Future.error('Failed to fetch thread');
+      }
+      return threads;
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<List<Thread>> fetchPage(String boardName, int page) async {
+    List<Thread> threads = [];
+    try {
+      final response = await http.get(api.getPageUri(boardName, page),
+          headers: {'Accept': 'application/json'});
+      if (response.statusCode == 200) {
+        threads = await compute(parseThreads, response.body);
+      } else {
+        return Future.error('Failed to fetch page');
+      }
+      return threads;
+    } catch (e) {
+      return Future.error(e.toString());
+    }
   }
 }
