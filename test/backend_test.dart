@@ -43,13 +43,11 @@ void main() {
     }
   });
 
-  test("Backedn Testing", () async {
+  test("Backend Testing", () async {
     final backend = Backend();
     final boards = await backend.fetchBoards();
     final selectedBoard = boards[Random().nextInt(boards.length)];
     final threads = await backend.fetchPage(selectedBoard.name, 1);
-    final thread = threads[Random().nextInt(threads.length)];
-    debugPrint(thread.post.title);
-    expect(1, 1);
+    assert(threads.isNotEmpty);
   });
 }
