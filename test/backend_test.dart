@@ -5,7 +5,6 @@ import 'package:channeler/backend/thread.dart';
 import 'package:http/http.dart' as http;
 import 'package:channeler/backend/api_endpoint.dart';
 import 'package:channeler/backend/backend.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
