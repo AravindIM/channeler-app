@@ -1,10 +1,9 @@
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/thread.dart';
+import 'package:channeler/widgets/feed_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:html2md/html2md.dart' as html2md;
 
 class Feed extends StatefulWidget {
   const Feed({super.key, required this.backend, required this.boardName});
@@ -53,24 +52,15 @@ class _FeedState extends State<Feed> {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView(
-      pagingController: _pagingController,
-      builderDelegate: PagedChildBuilderDelegate(
-        itemBuilder: (context, Thread item, index) {
-          final content = html2md.convert('${item.post.content}');
-          return ListTile(
-            title: Text(
-              item.post.title ?? '',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Markdown(
-              data: content,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              selectable: true,
-            ),
-          );
-        },
+    return RefreshIndicator(
+      onRefresh: () => Future.sync(() => _pagingController.refresh()),
+      child: PagedListView<int, Thread>(
+        pagingController: _pagingController,
+        builderDelegate: PagedChildBuilderDelegate(
+          itemBuilder: (context, Thread item, index) {
+            return FeedCard(thread: item);
+          },
+        ),
       ),
     );
   }
