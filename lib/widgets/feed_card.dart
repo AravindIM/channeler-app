@@ -39,13 +39,11 @@ class _FeedCardState extends State<FeedCard> {
               children: [
                 SizedBox(
                   width: 280,
-                  child: Expanded(
-                    child: Text(
-                      title,
-                      softWrap: true,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+                  child: Text(
+                    title,
+                    softWrap: true,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const Spacer(flex: 1),
