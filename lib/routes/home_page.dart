@@ -21,13 +21,16 @@ class _HomePageState extends State<HomePage> {
         currentBoard: '',
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Welcome to ${widget.title}',
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                  'Welcome to ${widget.title}! Check the sidebar for the list of boards.',
+                  style: const TextStyle(fontSize: 20)),
+            ],
+          ),
         ),
       ),
     );
