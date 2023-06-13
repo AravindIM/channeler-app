@@ -38,7 +38,7 @@ class _FeedCardState extends State<FeedCard> {
             Row(
               children: [
                 SizedBox(
-                  width: 280,
+                  width: 290,
                   child: Text(
                     title,
                     softWrap: true,
