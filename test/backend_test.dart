@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/thread.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +6,7 @@ import 'package:channeler/backend/backend.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test("API Testing", () {
+  test("API Uri Generation", () {
     final api = ApiEndpoint.for4chan();
     final boardsUri = api.getBoardsUri();
     expect(boardsUri.toString(), "https://a.4cdn.org/boards.json");
@@ -25,7 +23,7 @@ void main() {
       final boards = parseBoards(response.body);
       assert(boards.isNotEmpty);
     } else {
-      return Future.error('Failed to fetch boards');
+      return Future.error('Failed to parse boards!');
     }
   });
 
@@ -38,15 +36,20 @@ void main() {
       final threads = parseThreads(response.body);
       assert(threads.isNotEmpty);
     } else {
-      return Future.error('Failed to fetch boards');
+      return Future.error('Failed to parse threads!');
     }
   });
 
-  test("Backend Testing", () async {
+  test("Parsing Pages", () async {
     final backend = Backend();
     final boards = await backend.fetchBoards();
-    final selectedBoard = boards[Random().nextInt(boards.length)];
-    final threads = await backend.fetchPage(selectedBoard.name, 1);
-    assert(threads.isNotEmpty);
+    for (final board in boards) {
+      try {
+        final threads = await backend.fetchPage(board.name, 1);
+        assert(threads.isNotEmpty);
+      } catch (e) {
+        Future.error('Failed to parse page for board /${board.name}/!');
+      }
+    }
   });
 }
