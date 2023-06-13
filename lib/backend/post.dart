@@ -26,15 +26,25 @@ class Post {
       required this.pinned});
 
   factory Post.fromJson(Map<String, dynamic> json) {
-    const dateFormatString = "MM/dd/yy(E)HH:mm:ss";
-    final dateFormat = DateFormat(dateFormatString);
+    const dateFormatString1 = "MM/dd/yy(E)HH:mm:ss";
+    const dateFormatString2 = "MM/dd/yy(E)HH:mm";
+
+    final dateFormat1 = DateFormat(dateFormatString1);
+    final dateFormat2 = DateFormat(dateFormatString2);
+
+    DateTime timestamp;
+    try {
+      timestamp = dateFormat1.parse(json['now']);
+    } catch (e) {
+      timestamp = dateFormat2.parse(json['now']);
+    }
     return Post(
         id: json['no'] as int,
-        username: json['name'] as String,
+        username: json['name'] ?? 'Anonymous',
         userid: json['id'] as String?,
         title: html2md.convert(json['sub'] ?? ''),
         content: html2md.convert(json['com'] ?? ''),
-        timestamp: dateFormat.parse(json['now']), //convert to DateTime
+        timestamp: timestamp,
         attachment: json['filename'] as String?,
         attachmentExtension: json['ext'] as String?,
         replyCount: json['replies'] ?? 0,
