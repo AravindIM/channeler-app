@@ -44,25 +44,34 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
+  icons_launcher: "^2.1.1"
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  web:
-    generate: true
-    image_path: "assets/icon/icon.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: true
-    image_path: "assets/icon/icon.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: true
-    image_path: "assets/icon/icon.png"
+icons_launcher:
+  image_path: "assets/icon/icon_border.png"
+  platforms:
+    android:
+      enable: true
+      image_path: "assets/icon/icon_border.png"
+      adaptive_background_image: "assets/icon/icon_bg.png"
+      adaptive_foreground_image: "assets/icon/icon_fg.png"
+      adaptive_round_image: "assets/icon/icon_round.png"
+      adaptive_monochrome_image: "assets/icon/icon.png"
+    ios:
+      enable: true
+      image_path: "assets/icon/icon.png"
+    web:
+      enable: true
+      image_path: "assets/icon/icon_border.png"
+      favicon_path: "assets/icon/icon_round.png"
+    macos:
+      enable: false
+      image_path: "assets/icon/icon_border.png"
+    windows:
+      enable: false
+      image_path: "assets/icon/icon_border.png"
+    linux:
+      enable: false
+      image_path: "assets/icon/icon_border.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
