@@ -112,6 +112,11 @@ class _FeedCardState extends State<FeedCard> {
                         color: colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(5),
                       ),
+                      a: TextStyle(
+                        color: colorScheme.primary,
+                        decoration: TextDecoration.underline,
+                        decorationColor: primaryColor,
+                      ),
                     ),
                   ),
                 ],
