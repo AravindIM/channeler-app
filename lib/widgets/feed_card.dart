@@ -91,6 +91,7 @@ class _FeedCardState extends State<FeedCard> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (title.isNotEmpty)
                     Text(
