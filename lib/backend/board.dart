@@ -5,19 +5,22 @@ class Board {
   final String title;
   final int pages;
   final int threadsPerPage;
+  final bool nsfw;
 
   const Board(
       {required this.name,
       required this.title,
       required this.pages,
-      required this.threadsPerPage});
+      required this.threadsPerPage,
+      required this.nsfw});
 
   factory Board.fromJson(Map<String, dynamic> json) {
     return Board(
         name: json['board'] as String,
         title: json['title'] as String,
         pages: json['pages'] as int,
-        threadsPerPage: json['per_page'] as int);
+        threadsPerPage: json['per_page'] as int,
+        nsfw: json['ws_board'] == 0);
   }
 }
 
