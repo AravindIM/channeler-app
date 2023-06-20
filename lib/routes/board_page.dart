@@ -12,14 +12,15 @@ class BoardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final backend = Provider.of<Backend>(context);
-    final title = backend.findBoardByName(name).title;
+    final board = backend.findBoardByName(name);
+    final title = board.title;
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Theme.of(context).colorScheme.primary,
-        title: Text('/$name/ - $title'),
+        title: Text(title),
       ),
       drawer: SideMenu(currentBoard: name),
-      body: Feed(backend: backend, boardName: name),
+      body: Feed(backend: backend, board: board),
     );
   }
 }

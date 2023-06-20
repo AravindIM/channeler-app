@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class Feed extends StatefulWidget {
-  const Feed({super.key, required this.backend, required this.boardName});
+  const Feed({super.key, required this.backend, required this.board});
   final Backend backend;
-  final String boardName;
+  final Board board;
 
   @override
   State<Feed> createState() => _FeedState();
@@ -21,7 +21,7 @@ class _FeedState extends State<Feed> {
   @override
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(widget.backend, widget.boardName, pageKey);
+      _fetchPage(widget.backend, widget.board.name, pageKey);
     });
     super.initState();
   }
@@ -58,7 +58,7 @@ class _FeedState extends State<Feed> {
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate(
           itemBuilder: (context, Thread item, index) {
-            return FeedCard(thread: item);
+            return FeedCard(thread: item, board: widget.board);
           },
         ),
       ),

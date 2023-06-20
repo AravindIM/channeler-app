@@ -35,7 +35,7 @@ class _BoardListViewState extends State<BoardListView> {
                 final board = snapshot.data![index];
                 final boardName = board.name;
                 final boardTitle = board.title;
-                final boardNsfw = board.nsfw ? 'nsfw' : '';
+                final boardNsfw = board.nsfw ? 'NSFW' : '';
                 final bool isSelected = boardName == widget.currentBoard;
                 return ListTile(
                   selected: isSelected,
