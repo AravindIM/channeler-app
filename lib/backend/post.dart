@@ -31,6 +31,23 @@ class Post {
 
     final dateFormat1 = DateFormat(dateFormatString1);
     final dateFormat2 = DateFormat(dateFormatString2);
+    final freeUrlFormat = RegExp(r"(?<!\]\()(https?://[^\s)]+)");
+    final quoteLinkFormat = RegExp(r"\[");
+    const zeroSpace = '\u200B';
+
+    final deadLinkRule = html2md.Rule(
+      'deadlink',
+      filterFn: (node) {
+        if (node.nodeName == 'span' && node.className == 'deadlink') {
+          return true;
+        }
+        return false;
+      },
+      replacement: (content, node) {
+        final String deadLink = node.textContent;
+        return '[~~$deadLink~~]()';
+      },
+    );
 
     DateTime timestamp;
     try {
@@ -43,7 +60,13 @@ class Post {
         username: json['name'] ?? 'Anonymous',
         userid: json['id'] as String?,
         title: html2md.convert(json['sub'] ?? '').trim(),
-        content: html2md.convert(json['com'] ?? '').trim(),
+        content: html2md
+            .convert(json['com'] ?? '', rules: [deadLinkRule])
+            .trim()
+            .replaceAllMapped(freeUrlFormat, (match) {
+              return '[${match.group(1)}](${match.group(1)})';
+            })
+            .replaceAll(quoteLinkFormat, '$zeroSpace['),
         timestamp: timestamp,
         attachment: json['filename'] as String?,
         attachmentExtension: json['ext'] as String?,
