@@ -26,31 +26,42 @@ class _BoardListViewState extends State<BoardListView> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final colorScheme = Theme.of(context).colorScheme;
+                final nsfwColor = colorScheme.error;
+                final onNsfwColor = colorScheme.onError;
                 final MaterialColor primaryColor =
                     colorScheme.primary as MaterialColor;
+                final onPrimary = colorScheme.onPrimary;
                 final shade = 500 + Random().nextInt(4) * 100;
                 final board = snapshot.data![index];
                 final boardName = board.name;
                 final boardTitle = board.title;
+                final boardNsfw = board.nsfw ? 'nsfw' : '';
                 final bool isSelected = boardName == widget.currentBoard;
                 return ListTile(
                   selected: isSelected,
                   selectedColor: colorScheme.onBackground,
                   selectedTileColor: primaryColor.shade100,
                   leading: CircleAvatar(
-                    backgroundColor: primaryColor[shade],
+                    backgroundColor:
+                        board.nsfw ? nsfwColor : primaryColor[shade],
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
                           '/$boardName/',
-                          style: const TextStyle(fontWeight: FontWeight.w900),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: board.nsfw ? onNsfwColor : onPrimary),
                         ),
                       ),
                     ),
                   ),
                   title: Text(boardTitle),
+                  subtitle: Text(
+                    boardNsfw,
+                    style: TextStyle(color: nsfwColor),
+                  ),
                   onTap: () {
                     context.go('/board/$boardName');
                     context.pop();
