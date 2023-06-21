@@ -33,7 +33,7 @@ jobs:
       - name: Generating Changelog
         id: generate_changelog
         run: |
-          echo "PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_ENV
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags "$(git rev-list --tags --skip=1 --max-count=1)")
           git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD > changelog.txt
                 
           # Extract entries with "Added" or "Add" prefix
@@ -41,9 +41,13 @@ jobs:
                 
           # Extract entries with other prefixes
           cat changelog.txt | grep -Eiv '^\-\s(Add|Added):' > changelog_fixes.txt
-                
-          echo "CHANGELOG_FEATURES=$(cat changelog_features.txt)" >> $GITHUB_ENV
-          echo "CHANGELOG_FIXES=$(cat changelog_fixes.txt)" >> $GITHUB_ENV
+          
+          echo "CHANGELOG_FEATURES<<$EOF" >> "$GITHUB_ENV"
+          cat changelog_features.txt >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
+          echo "CHANGELOG_FIXES<<$EOF" >> "$GITHUB_ENV"
+          cat changelog_fixes.txt >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
 
       - name: Create Release
         id: create_release
