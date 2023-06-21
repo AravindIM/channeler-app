@@ -1,7 +1,7 @@
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/thread.dart';
-import 'package:channeler/widgets/feed_card.dart';
+import 'package:channeler/widgets/feed/feed_card.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 

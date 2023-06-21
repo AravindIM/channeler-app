@@ -1,5 +1,5 @@
 import 'package:channeler/backend/backend.dart';
-import 'package:channeler/widgets/feed.dart';
+import 'package:channeler/widgets/feed/feed.dart';
 import 'package:channeler/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
