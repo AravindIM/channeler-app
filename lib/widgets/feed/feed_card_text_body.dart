@@ -1,6 +1,7 @@
 import 'package:channeler/backend/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FeedCardTextBody extends StatelessWidget {
   const FeedCardTextBody(
@@ -42,6 +43,18 @@ class FeedCardTextBody extends StatelessWidget {
                 decorationColor: colorScheme.primary,
               ),
             ),
+            onTapLink: (text, href, title) {
+              String url = href ?? '';
+              if (url.isNotEmpty) {
+                if (url.startsWith('/')) {
+                  url = 'https://boards.4channel.org$href';
+                }
+                launchUrl(
+                  Uri.parse(url),
+                  mode: LaunchMode.externalApplication,
+                );
+              }
+            },
           ),
         ],
       ),
