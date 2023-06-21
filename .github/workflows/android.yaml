@@ -37,7 +37,7 @@ jobs:
           git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD > changelog.txt
                 
           # Extract entries with "Added" or "Add" prefix
-          cat changelog.txt | grep -Ei '^\-\s(Add|Added):' > changelog_features.txt
+          cat changelog.txt | grep -Ei '^\-\s(Add|Added):' | sed 's/^\-\s(Add|Added)://g' > changelog_features.txt
                 
           # Extract entries with other prefixes
           cat changelog.txt | grep -Eiv '^\-\s(Add|Added):' > changelog_fixes.txt
