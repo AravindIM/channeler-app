@@ -33,8 +33,9 @@ jobs:
       - name: Generating Changelog
         id: generate_changelog
         run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           git fetch -a
-          PREVIOUS_TAG=$(git describe --abbrev=0 --tags "$(git rev-list --tags --skip=1 --max-count=1)")
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags --match 'v*' --exclude '*-*' HEAD^)
           git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD > changelog.txt
                 
           # Extract entries with "Added" or "Add" prefix
