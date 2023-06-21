@@ -30,6 +30,21 @@ jobs:
       - name: Build APKs
         run: flutter build apk --split-per-abi --release
 
+      - name: Generating Changelog
+        id: generate_changelog
+        run: |
+          echo "PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_ENV
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD > changelog.txt
+                
+          # Extract entries with "Added" or "Add" prefix
+          cat changelog.txt | grep -Ei '^\-\s(Add|Added):' > changelog_features.txt
+                
+          # Extract entries with other prefixes
+          cat changelog.txt | grep -Eiv '^\-\s(Add|Added):' > changelog_fixes.txt
+                
+          echo "CHANGELOG_FEATURES=$(cat changelog_features.txt)" >> $GITHUB_ENV
+          echo "CHANGELOG_FIXES=$(cat changelog_fixes.txt)" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -40,6 +55,12 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+          body: |
+            # What's new
+            ## Features
+            ${{ env.CHANGELOG_FEATURES }}
+            ## Fixes
+            ${{ env.CHANGELOG_FIXES }}
 
       - name: Upload armeabi-v7a APK
         id: upload_armeabi
