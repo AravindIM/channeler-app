@@ -31,8 +31,9 @@ class Post {
 
     final dateFormat1 = DateFormat(dateFormatString1);
     final dateFormat2 = DateFormat(dateFormatString2);
-    final freeUrlFormat = RegExp(r"(?<!\]\()(https?://[^\s)]+)");
-    final quoteLinkFormat = RegExp(r"\[");
+    final autoUrlFormat = RegExp(
+        r"(?<!\]\()(?<!https:\/\/)(?<!http:\/\/)(?<!ftp:\/\/)\b((https?|ftp):\/\/)?([\w-]{1,256}\.)+\w{2,256}([^\s\]]+)?\b(?!\]\()");
+    final quoteLinkFormat = RegExp(r"\[[^\s\]]+\]\([^\s\)]*\)");
     const zeroSpace = '\u200B';
 
     final deadLinkRule = html2md.Rule(
@@ -63,10 +64,19 @@ class Post {
         content: html2md
             .convert(json['com'] ?? '', rules: [deadLinkRule])
             .trim()
-            .replaceAllMapped(freeUrlFormat, (match) {
-              return '[${match.group(1)}](${match.group(1)})';
+            .replaceAllMapped(autoUrlFormat, (match) {
+              final urlMatch = match.group(0) ?? '';
+              if (!urlMatch.startsWith('http://') &&
+                  !urlMatch.startsWith('https://') &&
+                  !urlMatch.startsWith('ftp://')) {
+                return '[$urlMatch](https://$urlMatch)';
+              } else {
+                return '[$urlMatch]($urlMatch)';
+              }
             })
-            .replaceAll(quoteLinkFormat, '$zeroSpace['),
+            .replaceAllMapped(quoteLinkFormat, (match) {
+              return '$zeroSpace${match.group(0)}';
+            }),
         timestamp: timestamp,
         attachment: json['filename'] as String?,
         attachmentExtension: json['ext'] as String?,
