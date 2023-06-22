@@ -38,9 +38,10 @@ jobs:
 
       - name: Decode Keystore
         id: decode_keystore
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v1.2
         with:
-          fileName: '/home/runner/work/channeler-app/channeler-app/android/key.jks'
+          fileName: 'key.jks'
+          fileDir: './android/'
           encodedString: ${{ secrets.KEY_JKS }}
 
       - name: Build APKs
