@@ -36,7 +36,17 @@ jobs:
       - name: Run Tests
         run: flutter test
 
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'android/key.jks'
+          encodedString: ${{ secrets.KEY_JKS }}
+
       - name: Build APKs
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: flutter build apk --split-per-abi --release
 
       - name: Draft Release
