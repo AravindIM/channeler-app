@@ -1,4 +1,4 @@
-name-template: 'Channeler v$RESOLVED_VERSION 🌈'
+name-template: 'Channeler v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 categories:
   - title: '🚀 Features'
@@ -20,7 +20,9 @@ categories:
       - 'tests'
       - 'testing'
   - title: '🧰 Maintenance'
-    label: 'chore'
+    labels:
+      - 'chore'
+      - 'maintenance'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 
@@ -43,15 +45,24 @@ template: |
 autolabeler:
   - label: 'chore'
     files:
-      - '*.md'
+      - '*.yaml'
+      - '*.yml'
     branch:
-      - '/docs{0,1}\/.+/'
       - '/maintenance\/.+/'
       - '/chore\/.+/'
     title:
-      - '/docs/i'
       - '/maintenance/i'
       - '/chore/i'
+
+  - label: 'docs'
+    files:
+      - '*.md'
+    branch:
+      - '/docs{0,1}\/.+/'
+      - '/documentation\/.+/'
+    title:
+      - '/docs/i'
+      - '/documentation/i'
   - label: 'bug'
     branch:
       - '/fix\/.+/'
