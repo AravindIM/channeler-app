@@ -32,6 +32,12 @@ jobs:
       - name: Run Tests
         run: flutter test
 
+      - name: Draft Release
+        id: draft_release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.2
@@ -44,13 +50,8 @@ jobs:
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        run: flutter build apk --split-per-abi --release
-
-      - name: Draft Release
-        id: draft_release
-        uses: release-drafter/release-drafter@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.draft_release.outputs.tag_name }}
+        run: flutter build apk --split-per-abi --release --build-name=${TAG_NAME//v/}
 
       - name: Upload armeabi-v7a APK
         id: upload_armeabi
