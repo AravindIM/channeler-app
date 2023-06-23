@@ -1,0 +1,48 @@
+name: Pull Request Handler
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  test_pull_request:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v1
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze Code
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test
+
+  label_pull_request:
+    permissions:
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Labelling Pull Request
+        id: label_pr
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
