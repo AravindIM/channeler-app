@@ -19,6 +19,8 @@ class _HomePageState extends State<HomePage> {
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
+            floating: true,
+            snap: true,
             foregroundColor: Theme.of(context).colorScheme.primary,
             title: Text(widget.title),
           )
