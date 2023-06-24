@@ -15,13 +15,16 @@ class BoardPage extends StatelessWidget {
     final board = backend.findBoardByName(name);
     final title = board.title;
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(title),
-      ),
-      drawer: SideMenu(currentBoard: name),
-      body: Feed(backend: backend, board: board),
-    );
+        drawer: SideMenu(currentBoard: name),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              title: Text(title),
+            ),
+          ],
+          body: Feed(backend: backend, board: board),
+        ));
   }
 }
 

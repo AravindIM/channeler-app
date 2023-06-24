@@ -13,23 +13,27 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(widget.title),
-      ),
       drawer: const SideMenu(
         currentBoard: '',
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                  'Welcome to ${widget.title}! Check the sidebar for the list of boards.',
-                  style: const TextStyle(fontSize: 20)),
-            ],
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            foregroundColor: Theme.of(context).colorScheme.primary,
+            title: Text(widget.title),
+          )
+        ],
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                    'Welcome to ${widget.title}! Check the sidebar for the list of boards.',
+                    style: const TextStyle(fontSize: 20)),
+              ],
+            ),
           ),
         ),
       ),
