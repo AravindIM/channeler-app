@@ -19,6 +19,8 @@ class BoardPage extends StatelessWidget {
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
+              floating: true,
+              snap: true,
               foregroundColor: Theme.of(context).colorScheme.primary,
               title: Text(title),
             ),
