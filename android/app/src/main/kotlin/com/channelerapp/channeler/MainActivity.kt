@@ -1,4 +1,4 @@
-package com.example.channeler
+package com.channelerapp.channeler
 
 import io.flutter.embedding.android.FlutterActivity
 
