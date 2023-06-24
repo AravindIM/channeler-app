@@ -74,6 +74,8 @@ autolabeler:
     branch:
       - '/feature\/.+/'
       - '/enhancement\/.+/'
+      - '/feat\/.+/'
     title:
       - '/feature/i'
       - '/enhancement/i'
+      - '/feat/i'
