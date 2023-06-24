@@ -55,6 +55,7 @@ class _FeedState extends State<Feed> {
     return RefreshIndicator(
       onRefresh: () => Future.sync(() => _pagingController.refresh()),
       child: PagedListView<int, Thread>(
+        padding: EdgeInsets.zero,
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate(
           itemBuilder: (context, Thread item, index) {
