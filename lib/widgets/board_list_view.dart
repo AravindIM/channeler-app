@@ -18,83 +18,111 @@ class _BoardListViewState extends State<BoardListView> {
   Widget build(BuildContext context) {
     final backend = Provider.of<Backend>(context);
     return FutureBuilder<List<Board>>(
-        future: backend.fetchBoards(),
-        builder: (context, snapshot) {
-          Widget child;
-          if (snapshot.hasData) {
-            child = ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final colorScheme = Theme.of(context).colorScheme;
-                final nsfwColor = colorScheme.error;
-                final onNsfwColor = colorScheme.onError;
-                final MaterialColor primaryColor =
-                    colorScheme.primary as MaterialColor;
-                final onPrimary = colorScheme.onPrimary;
-                final shade = 500 + Random().nextInt(4) * 100;
-                final board = snapshot.data![index];
-                final boardName = board.name;
-                final boardTitle = board.title;
-                final boardNsfw = board.nsfw ? 'NSFW' : '';
-                final bool isSelected = boardName == widget.currentBoard;
-                return ListTile(
-                  selected: isSelected,
-                  selectedColor: colorScheme.onBackground,
-                  selectedTileColor: primaryColor.shade100,
-                  leading: CircleAvatar(
-                    backgroundColor:
-                        board.nsfw ? nsfwColor : primaryColor[shade],
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          '/$boardName/',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              color: board.nsfw ? onNsfwColor : onPrimary),
-                        ),
-                      ),
-                    ),
-                  ),
-                  title: Text(boardTitle),
-                  subtitle: Text(
-                    boardNsfw,
-                    style: TextStyle(color: nsfwColor),
-                  ),
-                  onTap: () {
-                    context.go('/board/$boardName');
-                    context.pop();
-                  },
-                );
-              },
-            );
-          } else if (snapshot.hasError) {
-            child = ListView(
-              children: const [
-                ListTile(
-                  leading: Icon(Icons.error_outline),
-                  title: Text(
-                    'Sorry, we could not fetch boards! Try checking if you are connected to the internet',
-                    style: TextStyle(fontSize: 16),
-                  ),
+      future: backend.fetchBoards(),
+      builder: (context, snapshot) {
+        Widget child;
+        if (snapshot.hasData) {
+          final List<Board> boards = snapshot.data!;
+          final List<Board> sfwBoards =
+              boards.where((board) => !board.nsfw).toList();
+          final List<Board> nsfwBoards =
+              boards.where((board) => board.nsfw).toList();
+          final colorScheme = Theme.of(context).colorScheme;
+          final nsfwColor = colorScheme.error;
+          child = ListView(
+            children: [
+              ExpansionTile(
+                initiallyExpanded: true,
+                title: Text(
+                  "General (SFW)",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700),
                 ),
-              ],
-            );
-          } else {
-            child = ListView(
-              children: const [
-                ListTile(
-                  leading: CircularProgressIndicator(),
-                  title: Text(
-                    'Loading list of Boards! Please wait!',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                children: _boardListTiles(context, sfwBoards),
+              ),
+              ExpansionTile(
+                initiallyExpanded: false,
+                title: Text(
+                  "Adult (NSFW 18+)",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: nsfwColor,
+                      fontWeight: FontWeight.w700),
                 ),
-              ],
-            );
-          }
-          return Expanded(child: child);
-        });
+                children: _boardListTiles(context, nsfwBoards),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          child = const Column(
+            children: [
+              ListTile(
+                leading: Icon(Icons.error_outline),
+                title: Text(
+                  'Sorry, we could not fetch boards! Try checking if you are connected to the internet',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          );
+        } else {
+          child = ListView(
+            children: const [
+              ListTile(
+                leading: CircularProgressIndicator(),
+                title: Text(
+                  'Loading list of Boards! Please wait!',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          );
+        }
+        return Expanded(child: child);
+      },
+    );
+  }
+
+  List<Widget> _boardListTiles(BuildContext context, List<Board> boards) {
+    return boards.map(
+      (board) {
+        final colorScheme = Theme.of(context).colorScheme;
+        final nsfwColor = colorScheme.error;
+        final onNsfwColor = colorScheme.onError;
+        final MaterialColor primaryColor = colorScheme.primary as MaterialColor;
+        final onPrimary = colorScheme.onPrimary;
+        final shade = 500 + Random().nextInt(4) * 100;
+        final boardName = board.name;
+        final boardTitle = board.title;
+        final bool isSelected = boardName == widget.currentBoard;
+        return ListTile(
+          selected: isSelected,
+          selectedColor: colorScheme.onBackground,
+          selectedTileColor: primaryColor.shade100,
+          leading: CircleAvatar(
+            backgroundColor: board.nsfw ? nsfwColor : primaryColor[shade],
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Text(
+                  '/$boardName/',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: board.nsfw ? onNsfwColor : onPrimary),
+                ),
+              ),
+            ),
+          ),
+          title: Text(boardTitle),
+          onTap: () {
+            context.go('/board/$boardName');
+            context.pop();
+          },
+        );
+      },
+    ).toList();
   }
 }
