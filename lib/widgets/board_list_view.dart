@@ -1,6 +1,5 @@
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math';
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ class _BoardListViewState extends State<BoardListView> {
     return FutureBuilder<List<Board>>(
       future: backend.fetchBoards(),
       builder: (context, snapshot) {
-        Widget child;
+        List<Widget> children = [];
         if (snapshot.hasData) {
           final List<Board> boards = snapshot.data!;
           final List<Board> sfwBoards =
@@ -29,58 +28,57 @@ class _BoardListViewState extends State<BoardListView> {
               boards.where((board) => board.nsfw).toList();
           final colorScheme = Theme.of(context).colorScheme;
           final nsfwColor = colorScheme.error;
-          child = ListView(
-            children: [
-              ExpansionTile(
-                initiallyExpanded: true,
-                title: Text(
-                  "General (SFW)",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700),
-                ),
-                children: _boardListTiles(context, sfwBoards),
+          children = [
+            ExpansionTile(
+              initiallyExpanded: true,
+              title: Text(
+                "General (SFW)",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w700),
               ),
-              ExpansionTile(
-                initiallyExpanded: false,
-                title: Text(
-                  "Adult (NSFW 18+)",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: nsfwColor,
-                      fontWeight: FontWeight.w700),
-                ),
-                children: _boardListTiles(context, nsfwBoards),
+              children: _boardListTiles(context, sfwBoards),
+            ),
+            ExpansionTile(
+              initiallyExpanded: false,
+              title: Text(
+                "Adult (NSFW 18+)",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: nsfwColor,
+                    fontWeight: FontWeight.w700),
               ),
-            ],
-          );
+              children: _boardListTiles(context, nsfwBoards),
+            ),
+          ];
         } else if (snapshot.hasError) {
-          child = const Column(
-            children: [
-              ListTile(
-                leading: Icon(Icons.error_outline),
-                title: Text(
-                  'Sorry, we could not fetch boards! Try checking if you are connected to the internet',
-                  style: TextStyle(fontSize: 16),
-                ),
+          children = const [
+            ListTile(
+              leading: Icon(Icons.error_outline),
+              title: Text(
+                'Sorry, we could not fetch boards! Try checking if you are connected to the internet',
+                style: TextStyle(fontSize: 16),
               ),
-            ],
-          );
+            ),
+          ];
         } else {
-          child = ListView(
-            children: const [
-              ListTile(
-                leading: CircularProgressIndicator(),
-                title: Text(
-                  'Loading list of Boards! Please wait!',
-                  style: TextStyle(fontSize: 16),
-                ),
+          children = const [
+            ListTile(
+              leading: CircularProgressIndicator(),
+              title: Text(
+                'Loading list of Boards! Please wait!',
+                style: TextStyle(fontSize: 16),
               ),
-            ],
-          );
+            ),
+          ];
         }
-        return Expanded(child: child);
+        return Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: children,
+          ),
+        );
       },
     );
   }
@@ -91,18 +89,16 @@ class _BoardListViewState extends State<BoardListView> {
         final colorScheme = Theme.of(context).colorScheme;
         final nsfwColor = colorScheme.error;
         final onNsfwColor = colorScheme.onError;
-        final MaterialColor primaryColor = colorScheme.primary as MaterialColor;
         final onPrimary = colorScheme.onPrimary;
-        final shade = 500 + Random().nextInt(4) * 100;
         final boardName = board.name;
         final boardTitle = board.title;
         final bool isSelected = boardName == widget.currentBoard;
         return ListTile(
           selected: isSelected,
           selectedColor: colorScheme.onBackground,
-          selectedTileColor: primaryColor.shade100,
+          selectedTileColor: colorScheme.primary,
           leading: CircleAvatar(
-            backgroundColor: board.nsfw ? nsfwColor : primaryColor[shade],
+            backgroundColor: board.nsfw ? nsfwColor : colorScheme.primary,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Padding(
