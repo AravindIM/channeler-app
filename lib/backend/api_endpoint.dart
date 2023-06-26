@@ -14,7 +14,7 @@ class ApiEndpoint {
     return const ApiEndpoint(
         boards: 'https://a.4cdn.org/boards.json',
         page: 'https://a.4cdn.org/{board}/{page}.json',
-        attachment: 'https://i.4cdn.org/{board}/{filename}{ext}',
+        attachment: 'https://i.4cdn.org/{board}/{filename}',
         thread: 'https://a.4cdn.org/{board}/thread/{id}.json');
   }
 
@@ -29,11 +29,10 @@ class ApiEndpoint {
         .replaceAll('{page}', page.toString()));
   }
 
-  Uri getAttachment(String board, String filename, String ext) {
+  Uri getAttachment(String board, String filename) {
     return Uri.parse(attachment
         .replaceAll('{board}', board)
-        .replaceAll('{filename}', filename)
-        .replaceAll('{ext}', ext));
+        .replaceAll('{filename}', filename));
   }
 
   Uri getThreadUri(String board, String id) {

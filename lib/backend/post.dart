@@ -9,19 +9,17 @@ class Post {
   final String content;
   final DateTime timestamp;
   final String? attachment;
-  final String? attachmentExtension;
   final int replyCount;
   final bool pinned;
 
   const Post(
       {required this.id,
       required this.username,
-      required this.userid,
+      this.userid,
       required this.title,
       required this.content,
       required this.timestamp,
-      required this.attachment,
-      required this.attachmentExtension,
+      this.attachment,
       required this.replyCount,
       required this.pinned});
 
@@ -31,10 +29,21 @@ class Post {
 
     final dateFormat1 = DateFormat(dateFormatString1);
     final dateFormat2 = DateFormat(dateFormatString2);
+    DateTime timestamp;
+
+    try {
+      timestamp = dateFormat1.parse(json['now']);
+    } catch (e) {
+      timestamp = dateFormat2.parse(json['now']);
+    }
+
+    final String filename = '${json['tim']}'.trim();
+    final String extension = json['ext'] ?? '';
+
+    const zeroSpace = '\u200B';
     final autoUrlFormat = RegExp(
         r"(?<!\]\()(?<!https:\/\/)(?<!http:\/\/)(?<!ftp:\/\/)\b((https?|ftp):\/\/)?([\w-]{1,256}\.)+\w{2,256}([^\s\]]+)?\b(?!\]\()");
     final quoteLinkFormat = RegExp(r"\[[^\s\]]+\]\([^\s\)]*\)");
-    const zeroSpace = '\u200B';
 
     final deadLinkRule = html2md.Rule(
       'deadlink',
@@ -50,12 +59,6 @@ class Post {
       },
     );
 
-    DateTime timestamp;
-    try {
-      timestamp = dateFormat1.parse(json['now']);
-    } catch (e) {
-      timestamp = dateFormat2.parse(json['now']);
-    }
     return Post(
         id: json['no'] as int,
         username: json['name'] ?? 'Anonymous',
@@ -78,8 +81,9 @@ class Post {
               return '$zeroSpace${match.group(0)}';
             }),
         timestamp: timestamp,
-        attachment: json['filename'] as String?,
-        attachmentExtension: json['ext'] as String?,
+        attachment: filename.isNotEmpty && extension.isNotEmpty
+            ? filename + extension
+            : null,
         replyCount: json['replies'] ?? 0,
         pinned: (json['sticky'] ?? 0) != 0);
   }
