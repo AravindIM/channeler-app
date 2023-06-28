@@ -11,6 +11,7 @@ class MediaHandler extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaMime = lookupMimeType(mediaUrl) ?? '';
     final mediaType = mediaMime.split('/')[0];
+    final colorScheme = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -35,7 +36,7 @@ class MediaHandler extends StatelessWidget {
                           height: 50,
                           width: 50,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: colorScheme.primary,
                             value: progress.progressPercentage.value,
                           ),
                         ),
