@@ -8,10 +8,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 1));
-  runApp(Provider<Backend>(
-    create: (_) => Backend(),
-    child: const MyApp(),
-  ));
+  runApp(
+    Provider<Backend>(
+      create: (_) => Backend(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

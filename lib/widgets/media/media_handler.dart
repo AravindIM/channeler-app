@@ -23,6 +23,8 @@ class MediaHandler extends StatelessWidget {
               ? InstaImageViewer(
                   child: FastCachedImage(
                     url: mediaUrl,
+                    color: Colors.white,
+                    colorBlendMode: BlendMode.dstOver,
                     fit: BoxFit.contain,
                     errorBuilder: (context, exception, stacktrace) {
                       return Text(stacktrace.toString());
