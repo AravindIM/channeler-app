@@ -42,7 +42,13 @@ class MediaHandler extends StatelessWidget {
                   ),
                 )
               : Center(
-                  child: Text('Unsupported media type: $mediaType'),
+                  child: Text(
+                    'Unsupported media type: $mediaMime',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
         );
       },
