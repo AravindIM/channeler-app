@@ -42,7 +42,7 @@ class _FeedCardState extends State<FeedCard> {
           FeedCardHeader(
             board: board,
             post: post,
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
           ),
           const Divider(
             thickness: 0.2,
