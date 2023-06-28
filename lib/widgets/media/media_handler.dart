@@ -30,10 +30,10 @@ class MediaHandler extends StatelessWidget {
                     loadingBuilder: (context, progress) {
                       return Center(
                         child: SizedBox(
-                          height: 20,
-                          width: 20,
+                          height: 50,
+                          width: 50,
                           child: CircularProgressIndicator(
-                            color: Colors.red,
+                            color: Colors.white,
                             value: progress.progressPercentage.value,
                           ),
                         ),
