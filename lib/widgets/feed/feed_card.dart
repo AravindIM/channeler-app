@@ -42,7 +42,7 @@ class _FeedCardState extends State<FeedCard> {
           FeedCardHeader(
             board: board,
             post: post,
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
           ),
           const Divider(
             thickness: 0.2,
@@ -54,6 +54,12 @@ class _FeedCardState extends State<FeedCard> {
                 mediaUrl: backend.api
                     .getAttachment(board.name, attachment)
                     .toString()),
+          if (attachment.isNotEmpty)
+            const Divider(
+              thickness: 0.2,
+              color: Colors.grey,
+              height: 0.2,
+            ),
           if (attachment.isNotEmpty) const SizedBox(height: 20),
           FeedCardTextBody(
               post: post, padding: const EdgeInsets.fromLTRB(20, 5, 20, 5)),

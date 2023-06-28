@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       drawer: const SideMenu(
         currentBoard: '',
@@ -21,19 +22,42 @@ class _HomePageState extends State<HomePage> {
           SliverAppBar(
             floating: true,
             snap: true,
-            foregroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: colorScheme.primary,
             title: Text(widget.title),
           )
         ],
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(30),
+            padding: const EdgeInsets.fromLTRB(30, 100, 30, 0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                    'Welcome to ${widget.title}! Check the sidebar for the list of boards.',
-                    style: const TextStyle(fontSize: 20)),
+                  'Hello Anon!',
+                  style: TextStyle(
+                    fontSize: 100,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 50),
+                Text(
+                  '> Welcome to ${widget.title}!',
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  '> Check the sidebar for the list of boards.',
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
               ],
             ),
           ),

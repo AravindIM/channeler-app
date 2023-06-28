@@ -28,9 +28,15 @@ class MyApp extends StatelessWidget {
             .copyWith(background: Colors.white, onBackground: Colors.black),
         useMaterial3: true,
         elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green),
-                foregroundColor: MaterialStateProperty.all(Colors.white))),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.green),
+            foregroundColor: MaterialStateProperty.all(Colors.white),
+          ),
+        ),
+        listTileTheme: ListTileThemeData(
+          selectedTileColor: Colors.green.shade100,
+          selectedColor: Colors.black,
+        ),
       ),
       routerConfig: appRouter,
     );

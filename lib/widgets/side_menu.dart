@@ -16,13 +16,29 @@ class SideMenu extends StatelessWidget {
             decoration: BoxDecoration(color: colorScheme.background),
             child: Align(
               alignment: Alignment.bottomLeft,
-              child: Text(
-                'Boards',
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Channeler',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 38,
+                      fontWeight: FontWeight.w700,
+                      height: 1.1,
+                    ),
+                  ),
+                  const Text(
+                    'Boards',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w300,
+                      height: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
