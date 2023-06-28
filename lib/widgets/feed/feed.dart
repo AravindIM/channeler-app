@@ -59,7 +59,11 @@ class _FeedState extends State<Feed> {
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate(
           itemBuilder: (context, Thread item, index) {
-            return FeedCard(thread: item, board: widget.board);
+            return FeedCard(
+              backend: widget.backend,
+              thread: item,
+              board: widget.board,
+            );
           },
         ),
       ),
