@@ -86,6 +86,7 @@ class _BoardListViewState extends State<BoardListView> {
   List<Widget> _boardListTiles(BuildContext context, List<Board> boards) {
     return boards.map(
       (board) {
+        final themeData = Theme.of(context);
         final colorScheme = Theme.of(context).colorScheme;
         final nsfwColor = colorScheme.error;
         final onNsfwColor = colorScheme.onError;
@@ -95,8 +96,9 @@ class _BoardListViewState extends State<BoardListView> {
         final bool isSelected = boardName == widget.currentBoard;
         return ListTile(
           selected: isSelected,
-          selectedColor: colorScheme.onBackground,
-          selectedTileColor: colorScheme.primary,
+          selectedTileColor: board.nsfw
+              ? nsfwColor.withOpacity(0.3)
+              : themeData.listTileTheme.selectedTileColor,
           leading: CircleAvatar(
             backgroundColor: board.nsfw ? nsfwColor : colorScheme.primary,
             child: FittedBox(
