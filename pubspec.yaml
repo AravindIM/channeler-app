@@ -30,6 +30,7 @@ environment:
 dependencies:
   cupertino_icons: ^1.0.2
   fast_cached_network_image: ^1.2.0
+  flick_video_player: ^0.5.0
   flutter:
     sdk: flutter
   flutter_markdown: ^0.6.15
@@ -43,6 +44,8 @@ dependencies:
   provider: ^6.0.5
   timeago: ^3.4.0
   url_launcher: ^6.1.11
+  video_player: ^2.7.0
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   change_app_package_name: "^1.0.0"

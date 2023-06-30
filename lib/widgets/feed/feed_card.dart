@@ -4,18 +4,22 @@ import 'package:channeler/backend/thread.dart';
 import 'package:channeler/widgets/feed/feed_card_text_body.dart';
 import 'package:channeler/widgets/feed/feed_card_footer.dart';
 import 'package:channeler/widgets/feed/feed_card_header.dart';
+import 'package:channeler/widgets/media/flick_multi_player/flick_multi_manager.dart';
 import 'package:channeler/widgets/media/media_handler.dart';
 import 'package:flutter/material.dart';
 
 class FeedCard extends StatefulWidget {
-  const FeedCard(
-      {super.key,
-      required this.thread,
-      required this.board,
-      required this.backend});
+  const FeedCard({
+    super.key,
+    required this.thread,
+    required this.board,
+    required this.backend,
+    required this.flickMultiManager,
+  });
   final Thread thread;
   final Board board;
   final Backend backend;
+  final FlickMultiManager flickMultiManager;
 
   @override
   State<FeedCard> createState() => _FeedCardState();
@@ -51,9 +55,10 @@ class _FeedCardState extends State<FeedCard> {
           ),
           if (attachment.isNotEmpty)
             MediaHandler(
-                mediaUrl: backend.api
-                    .getAttachment(board.name, attachment)
-                    .toString()),
+              mediaUrl:
+                  backend.api.getAttachment(board.name, attachment).toString(),
+              flickMultiManager: widget.flickMultiManager,
+            ),
           if (attachment.isNotEmpty)
             const Divider(
               thickness: 0.2,
