@@ -81,7 +81,7 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
       onVisibilityChanged: (visibility) {
         if (visibility.visibleFraction > 0.9) {
           widget.flickMultiManager.play(flickManager);
-        } else if (visibility.visibleFraction < 0.2) {
+        } else if (visibility.visibleFraction < 0.4) {
           widget.flickMultiManager.pause(flickManager);
         }
       },
