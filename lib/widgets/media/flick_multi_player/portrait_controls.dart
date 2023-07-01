@@ -98,24 +98,22 @@ class FeedPlayerPortraitControls extends StatelessWidget {
           FlickAutoHideChild(
             showIfVideoNotInitialized: false,
             child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
+              alignment: Alignment.bottomCenter,
+              child: FlickVideoProgressBar(
+                flickProgressBarSettings: FlickProgressBarSettings(
+                  height: 5,
                   padding: raiseBar
-                      ? const EdgeInsets.fromLTRB(30, 0, 30, 50)
+                      ? const EdgeInsets.fromLTRB(30, 0, 30, 40)
                       : EdgeInsets.zero,
-                  child: FlickVideoProgressBar(
-                    flickProgressBarSettings: FlickProgressBarSettings(
-                      height: 5,
-                      padding: EdgeInsets.zero,
-                      handleRadius: raiseBar ? 5 : 0,
-                      curveRadius: raiseBar ? 50 : 0,
-                      backgroundColor: Colors.white24,
-                      bufferedColor: barColor.withAlpha(100),
-                      playedColor: barColor,
-                      handleColor: barColor,
-                    ),
-                  ),
-                )),
+                  handleRadius: raiseBar ? 5 : 0,
+                  curveRadius: raiseBar ? 50 : 0,
+                  backgroundColor: Colors.white24,
+                  bufferedColor: barColor.withAlpha(100),
+                  playedColor: barColor,
+                  handleColor: barColor,
+                ),
+              ),
+            ),
           ),
         ],
       ),
