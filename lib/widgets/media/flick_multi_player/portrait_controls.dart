@@ -54,7 +54,8 @@ class PortraitControls extends StatelessWidget {
                             false) {
                           flickMultiManager?.toggleMute();
                         }
-                        flickManager?.flickControlManager?.replay();
+                        flickManager?.flickControlManager
+                            ?.seekTo(Duration.zero);
                         flickManager?.flickControlManager?.enterFullscreen();
                       },
                       child: const FlickSeekVideoAction(),
