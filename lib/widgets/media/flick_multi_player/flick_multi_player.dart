@@ -52,25 +52,27 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final loadingCircle = Center(
-      child: Stack(
-        children: [
-          Center(
-            child: CircularProgressIndicator(
-              color: colorScheme.primary,
-            ),
+    final loadingCircle = Stack(
+      children: [
+        Center(
+          child: CircularProgressIndicator(
+            color: colorScheme.primary,
           ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.black38,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: const FlickPlayToggle(),
-            ),
-          ),
-        ],
+        ),
+        const Center(
+          child: FlickPlayToggle(),
+        ),
+      ],
+    );
+
+    final loadingCircleFullScreen = Container(
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: CircularProgressIndicator(
+        color: colorScheme.primary,
       ),
     );
 
@@ -104,7 +106,7 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         ),
         flickVideoWithControlsFullscreen: FlickVideoWithControls(
           videoFit: BoxFit.contain,
-          playerLoadingFallback: loadingCircle,
+          playerLoadingFallback: loadingCircleFullScreen,
           controls: FullScreenControls(
             flickMultiManager: widget.flickMultiManager,
             flickManager: flickManager,
