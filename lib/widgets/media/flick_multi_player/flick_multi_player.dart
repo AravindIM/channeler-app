@@ -54,8 +54,8 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
 
     return VisibilityDetector(
       key: ObjectKey(flickManager),
-      onVisibilityChanged: (visiblityInfo) {
-        if (visiblityInfo.visibleFraction > 0.9) {
+      onVisibilityChanged: (visibility) {
+        if (visibility.visibleFraction > 0.9) {
           widget.flickMultiManager.play(flickManager);
         }
       },
@@ -63,10 +63,10 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         wakelockEnabled: !Platform.isLinux,
         wakelockEnabledFullscreen: !Platform.isLinux,
         preferredDeviceOrientationFullscreen: const [
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
         ],
         flickManager: flickManager,
         flickVideoWithControls: FlickVideoWithControls(
