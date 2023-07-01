@@ -43,24 +43,28 @@ class PortraitControls extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: FlickToggleSoundAction(
-                toggleMute: () {
-                  if (flickManager?.flickControlManager?.isMute ?? false) {
-                    flickMultiManager?.toggleMute();
-                  }
-                  flickManager?.flickControlManager?.replay();
-                  flickManager?.flickControlManager?.enterFullscreen();
-                  // if (!(flickManager?.flickControlManager?.isFullscreen ??
-                  //     false)) {
-                  //   flickManager?.flickControlManager?.toggleFullscreen();
-                  // }
-                  displayManager.handleShowPlayerControls();
-                },
-                child: const FlickSeekVideoAction(
-                  child: Center(
-                    child: FlickVideoBuffer(),
+            child: FlickAutoHideChild(
+              showIfVideoNotInitialized: false,
+              autoHide: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: FlickToggleSoundAction(
+                  toggleMute: () {
+                    if (flickManager?.flickControlManager?.isMute ?? false) {
+                      flickMultiManager?.toggleMute();
+                    }
+                    flickManager?.flickControlManager?.replay();
+                    flickManager?.flickControlManager?.enterFullscreen();
+                    // if (!(flickManager?.flickControlManager?.isFullscreen ??
+                    //     false)) {
+                    //   flickManager?.flickControlManager?.toggleFullscreen();
+                    // }
+                    displayManager.handleShowPlayerControls();
+                  },
+                  child: const FlickSeekVideoAction(
+                    child: Center(
+                      child: FlickVideoBuffer(),
+                    ),
                   ),
                 ),
               ),
