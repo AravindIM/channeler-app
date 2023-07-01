@@ -3,19 +3,17 @@ import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FeedPlayerPortraitControls extends StatelessWidget {
-  const FeedPlayerPortraitControls({
+class PortraitControls extends StatelessWidget {
+  const PortraitControls({
     Key? key,
     this.flickMultiManager,
     this.flickManager,
     this.barColor = Colors.white,
-    this.raiseBar = false,
   }) : super(key: key);
 
   final FlickMultiManager? flickMultiManager;
   final FlickManager? flickManager;
   final Color barColor;
-  final bool raiseBar;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
             child: FlickAutoHideChild(
               showIfVideoNotInitialized: false,
               child: Align(
@@ -46,10 +44,14 @@ class FeedPlayerPortraitControls extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: FlickToggleSoundAction(
                 toggleMute: () {
-                  flickMultiManager?.toggleMute();
+                  if (flickManager?.flickControlManager?.isMute ?? false) {
+                    flickMultiManager?.toggleMute();
+                  }
+                  flickManager?.flickControlManager?.replay();
+                  flickManager?.flickControlManager?.enterFullscreen();
                   // if (!(flickManager?.flickControlManager?.isFullscreen ??
                   //     false)) {
                   //   flickManager?.flickControlManager?.toggleFullscreen();
@@ -65,7 +67,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 15),
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
             child: FlickAutoHideChild(
               autoHide: true,
               showIfVideoNotInitialized: false,
@@ -83,14 +85,6 @@ class FeedPlayerPortraitControls extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: Colors.black38,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const FlickFullScreenToggle(),
-                  ),
                 ],
               ),
             ),
@@ -102,11 +96,9 @@ class FeedPlayerPortraitControls extends StatelessWidget {
               child: FlickVideoProgressBar(
                 flickProgressBarSettings: FlickProgressBarSettings(
                   height: 5,
-                  padding: raiseBar
-                      ? const EdgeInsets.fromLTRB(30, 0, 30, 40)
-                      : EdgeInsets.zero,
-                  handleRadius: raiseBar ? 5 : 0,
-                  curveRadius: raiseBar ? 50 : 0,
+                  padding: EdgeInsets.zero,
+                  handleRadius: 0,
+                  curveRadius: 0,
                   backgroundColor: Colors.white24,
                   bufferedColor: barColor.withAlpha(100),
                   playedColor: barColor,

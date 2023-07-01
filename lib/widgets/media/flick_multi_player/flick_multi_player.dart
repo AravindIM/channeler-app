@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:channeler/widgets/media/flick_multi_player/flick_multi_manager.dart';
+import 'package:channeler/widgets/media/flick_multi_player/fullscreen_controls.dart';
 import 'package:channeler/widgets/media/flick_multi_player/portrait_controls.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
@@ -51,12 +52,35 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final loadingCircle = Expanded(
+      child: Stack(
+        children: [
+          Center(
+            child: CircularProgressIndicator(
+              color: colorScheme.primary,
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: const FlickPlayToggle(),
+            ),
+          ),
+        ],
+      ),
+    );
 
     return VisibilityDetector(
       key: ObjectKey(flickManager),
       onVisibilityChanged: (visibility) {
         if (visibility.visibleFraction > 0.9) {
           widget.flickMultiManager.play(flickManager);
+        } else if (visibility.visibleFraction < 0.2) {
+          widget.flickMultiManager.pause(flickManager);
         }
       },
       child: FlickVideoPlayer(
@@ -71,12 +95,8 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         flickManager: flickManager,
         flickVideoWithControls: FlickVideoWithControls(
           videoFit: BoxFit.contain,
-          playerLoadingFallback: Center(
-            child: CircularProgressIndicator(
-              color: colorScheme.primary,
-            ),
-          ),
-          controls: FeedPlayerPortraitControls(
+          playerLoadingFallback: loadingCircle,
+          controls: PortraitControls(
             flickMultiManager: widget.flickMultiManager,
             flickManager: flickManager,
             barColor: widget.barColor,
@@ -84,12 +104,10 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         ),
         flickVideoWithControlsFullscreen: FlickVideoWithControls(
           videoFit: BoxFit.contain,
-          playerLoadingFallback:
-              const Center(child: CircularProgressIndicator()),
-          controls: FeedPlayerPortraitControls(
+          playerLoadingFallback: loadingCircle,
+          controls: FullScreenControls(
             flickMultiManager: widget.flickMultiManager,
             flickManager: flickManager,
-            raiseBar: true,
             barColor: widget.barColor,
           ),
           iconThemeData: const IconThemeData(
