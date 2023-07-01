@@ -52,7 +52,7 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final loadingCircle = Expanded(
+    final loadingCircle = Center(
       child: Stack(
         children: [
           Center(
