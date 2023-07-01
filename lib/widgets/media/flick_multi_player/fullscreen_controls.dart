@@ -56,9 +56,7 @@ class FullScreenControls extends StatelessWidget {
                       // }
                       displayManager.handleShowPlayerControls();
                     },
-                    child: const FlickSeekVideoAction(
-                      child: FlickVideoBuffer(),
-                    ),
+                    child: const FlickSeekVideoAction(),
                   ),
                 ),
               ),
@@ -125,6 +123,9 @@ class FullScreenControls extends StatelessWidget {
               ),
             ),
           ),
+          const Center(
+            child: FlickVideoBuffer(),
+          )
         ],
       ),
     );
