@@ -34,8 +34,12 @@ class FlickMultiManager {
     }
   }
 
-  pause() {
-    _activeManager?.flickControlManager?.pause();
+  pause([FlickManager? flickManager]) {
+    if (flickManager != null) {
+      flickManager.flickControlManager?.pause();
+    } else {
+      _activeManager?.flickControlManager?.pause();
+    }
   }
 
   play([FlickManager? flickManager]) {
