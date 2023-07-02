@@ -1,6 +1,9 @@
 import 'package:channeler/backend/post.dart';
+import 'package:channeler/markdown_syntaxes/autolinker.dart';
+import 'package:channeler/widgets/media/image_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
 
 class FeedCardTextBody extends StatelessWidget {
@@ -12,6 +15,10 @@ class FeedCardTextBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    List<md.InlineSyntax> customInlineSyntaxes = List<md.InlineSyntax>.from(
+      md.ExtensionSet.gitHubWeb.inlineSyntaxes,
+    );
+    customInlineSyntaxes.add(AutoLinker());
 
     return Padding(
       padding: padding,
@@ -43,12 +50,14 @@ class FeedCardTextBody extends StatelessWidget {
                 decorationColor: colorScheme.primary,
               ),
             ),
+            imageBuilder: (uri, title, alt) {
+              return ImageHandler(imageUrl: uri.toString());
+            },
+            extensionSet: md.ExtensionSet(
+                md.ExtensionSet.gitHubWeb.blockSyntaxes, customInlineSyntaxes),
             onTapLink: (text, href, title) {
               String url = href ?? '';
               if (url.isNotEmpty) {
-                if (url.startsWith('/')) {
-                  url = 'https://boards.4channel.org$href';
-                }
                 launchUrl(
                   Uri.parse(url),
                   mode: LaunchMode.externalApplication,
