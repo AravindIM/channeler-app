@@ -49,6 +49,9 @@ class FeedCardTextBody extends StatelessWidget {
                 decoration: TextDecoration.underline,
                 decorationColor: colorScheme.primary,
               ),
+              listBullet: TextStyle(
+                color: colorScheme.primary,
+              ),
             ),
             imageBuilder: (uri, title, alt) {
               return ImageHandler(imageUrl: uri.toString());
