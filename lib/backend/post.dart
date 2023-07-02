@@ -41,9 +41,7 @@ class Post {
     final String extension = json['ext'] ?? '';
 
     const zeroSpace = '\u200B';
-    final autoUrlFormat = RegExp(
-        r"(?<!\]\()(?<!https:\/\/)(?<!http:\/\/)(?<!ftp:\/\/)\b((https?|ftp):\/\/)?([\w-]{1,256}\.)+\w{2,256}([^\s\]]+)?\b(?!\]\()");
-    final quoteLinkFormat = RegExp(r"\[[^\s\]]+\]\([^\s\)]*\)");
+    final quoteLinkFormat = RegExp(r'\[[^\s\]]+\]\([^\s\)]*\)');
 
     final deadLinkRule = html2md.Rule(
       'deadlink',
@@ -59,24 +57,55 @@ class Post {
       },
     );
 
+    final standardisedImageRule = html2md.Rule(
+      'standardImage',
+      filterFn: (node) {
+        return node.nodeName == 'img';
+      },
+      replacement: (content, node) {
+        final String alt = node.getAttribute('alt') ?? '';
+        String src = node.getAttribute('alt') ?? '';
+        if (src.startsWith('//')) {
+          src = 'https:$src';
+        } else if (src.startsWith('/')) {
+          src = 'https://boards.4chan.org$src';
+        }
+        return '<img src="$src" alt="$alt">';
+      },
+    );
+
+    final standardisedLinkRule = html2md.Rule(
+      'standardLink',
+      filterFn: (node) {
+        return node.nodeName == 'a';
+      },
+      replacement: (content, node) {
+        final String label = node.textContent;
+        String href = node.getAttribute('href') ?? '';
+        if (href.startsWith('//')) {
+          href = 'https:$href';
+        } else if (href.startsWith('/')) {
+          href = 'https://boards.4chan.org$href';
+        }
+        return '[$label]($href)';
+      },
+    );
+
     return Post(
         id: json['no'] as int,
         username: json['name'] ?? 'Anonymous',
         userid: json['id'] as String?,
         title: html2md.convert(json['sub'] ?? '').trim(),
         content: html2md
-            .convert(json['com'] ?? '', rules: [deadLinkRule])
+            .convert(
+              json['com'] ?? '',
+              rules: [
+                deadLinkRule,
+                standardisedImageRule,
+                standardisedLinkRule,
+              ],
+            )
             .trim()
-            .replaceAllMapped(autoUrlFormat, (match) {
-              final urlMatch = match.group(0) ?? '';
-              if (!urlMatch.startsWith('http://') &&
-                  !urlMatch.startsWith('https://') &&
-                  !urlMatch.startsWith('ftp://')) {
-                return '[$urlMatch](https://$urlMatch)';
-              } else {
-                return '[$urlMatch]($urlMatch)';
-              }
-            })
             .replaceAllMapped(quoteLinkFormat, (match) {
               return '$zeroSpace${match.group(0)}';
             }),
