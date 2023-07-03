@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:html2md/html2md.dart' as html2md;
 
@@ -12,16 +13,17 @@ class Post {
   final int replyCount;
   final bool pinned;
 
-  const Post(
-      {required this.id,
-      required this.username,
-      this.userid,
-      required this.title,
-      required this.content,
-      required this.timestamp,
-      this.attachment,
-      required this.replyCount,
-      required this.pinned});
+  const Post({
+    required this.id,
+    required this.username,
+    this.userid,
+    required this.title,
+    required this.content,
+    required this.timestamp,
+    this.attachment,
+    required this.replyCount,
+    required this.pinned,
+  });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     const dateFormatString1 = "MM/dd/yy(E)HH:mm:ss";
@@ -42,6 +44,9 @@ class Post {
 
     const zeroSpace = '\u200B';
     final quoteLinkFormat = RegExp(r'\[[^\s\]]+\]\([^\s\)]*\)');
+    final markdownLinkFormat = RegExp(r'\[[^\]]*\]\([^\)]*\)');
+    final linkFormat =
+        RegExp(r'((https?|ftp):\/\/)?([\w-]{1,256}\.)+\w{2,256}([^\s\]]+)?\/?');
 
     final deadLinkRule = html2md.Rule(
       'deadlink',
@@ -91,24 +96,56 @@ class Post {
       },
     );
 
+    String markdownContent = html2md
+        .convert(
+          json['com'] ?? '',
+          rules: [
+            deadLinkRule,
+            standardisedImageRule,
+            standardisedLinkRule,
+          ],
+        )
+        .trim()
+        .replaceAllMapped(
+          quoteLinkFormat,
+          (match) {
+            return '$zeroSpace${match.group(0)}';
+          },
+        );
+
+    List<String> markdownLinks = markdownLinkFormat
+        .allMatches(markdownContent)
+        .map((match) => match[0] ?? '')
+        .toList();
+
+    List<String> portions = markdownContent.split(markdownLinkFormat);
+    debugPrint('${markdownLinks.length}');
+    debugPrint('${portions.length}');
+
+    String content = '';
+
+    for (var i = 0; i < portions.length; i++) {
+      content = content +
+          portions[i].replaceAllMapped(linkFormat, (match) {
+            String url = match[0] ?? '';
+            if (!url.startsWith('https://') &&
+                !url.startsWith('http://') &&
+                !url.startsWith('ftp://')) {
+              return '[$url](https://$url)';
+            }
+            return '[$url]($url)';
+          });
+      if (i < markdownLinks.length) {
+        content = content + markdownLinks[i];
+      }
+    }
+
     return Post(
         id: json['no'] as int,
         username: json['name'] ?? 'Anonymous',
         userid: json['id'] as String?,
         title: html2md.convert(json['sub'] ?? '').trim(),
-        content: html2md
-            .convert(
-              json['com'] ?? '',
-              rules: [
-                deadLinkRule,
-                standardisedImageRule,
-                standardisedLinkRule,
-              ],
-            )
-            .trim()
-            .replaceAllMapped(quoteLinkFormat, (match) {
-              return '$zeroSpace${match.group(0)}';
-            }),
+        content: content,
         timestamp: timestamp,
         attachment: filename.isNotEmpty && extension.isNotEmpty
             ? filename + extension
