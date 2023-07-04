@@ -42,11 +42,14 @@ class Post {
     final String filename = '${json['tim']}'.trim();
     final String extension = json['ext'] ?? '';
 
-    const zeroSpace = '\u200B';
-    final quoteLinkFormat = RegExp(r'\[[^\s\]]+\]\([^\s\)]*\)');
+    /* zero-width space used for enforcing links to be part of parent quote block */
+    const zeroWidthSpace = '\u200B';
+
+    /* Regex formats for search replacement in the content */
     final markdownLinkFormat = RegExp(r'\[[^\]]*\]\([^\)]*\)');
     final linkFormat =
         RegExp(r'((https?|ftp):\/\/)?([\w-]{1,256}\.)+\w{2,256}([^\s\]]+)?\/?');
+    final nonUrlNumberFormat = RegExp(r'^[^A-Za-z]+$');
 
     final deadLinkRule = html2md.Rule(
       'deadlink',
@@ -96,60 +99,52 @@ class Post {
       },
     );
 
-    String markdownContent = html2md
-        .convert(
-          json['com'] ?? '',
-          rules: [
-            deadLinkRule,
-            standardisedImageRule,
-            standardisedLinkRule,
-          ],
-        )
-        .trim()
-        .replaceAllMapped(
-          quoteLinkFormat,
-          (match) {
-            return '$zeroSpace${match.group(0)}';
-          },
-        );
+    String markdownContent = html2md.convert(
+      json['com'] ?? '',
+      rules: [
+        deadLinkRule,
+        standardisedImageRule,
+        standardisedLinkRule,
+      ],
+    ).trim();
 
     List<String> markdownLinks = markdownLinkFormat
         .allMatches(markdownContent)
         .map((match) => match[0] ?? '')
         .toList();
 
-    List<String> portions = markdownContent.split(markdownLinkFormat);
+    List<String> contentPortions = markdownContent.split(markdownLinkFormat);
 
     String content = '';
 
-    for (var i = 0; i < portions.length; i++) {
+    for (var i = 0; i < contentPortions.length; i++) {
       /* add portions not containing markdown links after linking the urls */
       content = content +
-          portions[i].replaceAllMapped(linkFormat, (match) {
-            final String url = match[0] ?? '';
-            final List<String> urlPortions = url.split('/');
+          contentPortions[i].replaceAllMapped(linkFormat, (match) {
+            final String matchedText = match[0] ?? '';
+            final List<String> urlPortions = matchedText.split('/');
             /* ignore file names */
             if (urlPortions.length == 1) {
               final String? mimeType = lookupMimeType(urlPortions[0]);
               if (mimeType != null) {
-                return url;
+                return matchedText;
               }
             }
-            /* ignore numbers seperated by / (frontslash) */
-            if (urlPortions.every((portion) => num.tryParse(portion) != null)) {
-              return url;
+            /* ignore numbers seperated by special characters */
+            if (nonUrlNumberFormat.hasMatch(matchedText)) {
+              return matchedText;
             }
             /* urls without protocol specified at the beginning */
-            if (!url.startsWith('https://') &&
-                !url.startsWith('http://') &&
-                !url.startsWith('ftp://')) {
-              return '[$url](https://$url)';
+            if (!matchedText.startsWith('https://') &&
+                !matchedText.startsWith('http://') &&
+                !matchedText.startsWith('ftp://')) {
+              return '$zeroWidthSpace[$matchedText](https://$matchedText)';
             }
-            return '[$url]($url)';
+            return '$zeroWidthSpace[$matchedText]($matchedText)';
           });
       /* join with the markdowned links */
       if (i < markdownLinks.length) {
-        content = content + markdownLinks[i];
+        content = content + zeroWidthSpace + markdownLinks[i];
       }
     }
 
