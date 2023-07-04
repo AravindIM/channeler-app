@@ -103,7 +103,27 @@ class FullScreenControls extends StatelessWidget {
                         color: Colors.white,
                       ),
                       const FlickPlayToggle(),
-                      const FlickFullScreenToggle(),
+                      FlickFullScreenToggle(
+                        toggleFullscreen: () {
+                          final bool isPlaying =
+                              flickManager?.flickVideoManager?.isPlaying ??
+                                  false;
+                          final bool isMute =
+                              flickManager?.flickControlManager?.isMute ??
+                                  false;
+                          /*
+                            Mute audio if paused in fullscreen with audio not 
+                            muted and the user presses exit fullscreen
+                          */
+                          if (!isPlaying && !isMute) {
+                            flickMultiManager?.toggleMute();
+                          }
+                          /* resume playing video outside fullscren */
+                          flickMultiManager?.play(flickManager);
+                          /* exit fullscreen */
+                          flickManager?.flickControlManager?.exitFullscreen();
+                        },
+                      ),
                     ],
                   ),
                 ),
