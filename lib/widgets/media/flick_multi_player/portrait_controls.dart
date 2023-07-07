@@ -56,7 +56,7 @@ class PortraitControls extends StatelessWidget {
                         bool isPlaying =
                             flickManager?.flickVideoManager?.isPlaying ?? false;
                         if (!isPlaying) {
-                          Scrollable.ensureVisible(context);
+                          Scrollable.ensureVisible(context, alignment: 0.5);
                         }
                         if (flickManager?.flickControlManager?.isMute ??
                             false) {
