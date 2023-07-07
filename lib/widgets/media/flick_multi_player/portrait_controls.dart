@@ -24,10 +24,12 @@ class PortraitControls extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              /* Remaining time bubble */
               Padding(
                 padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
                 child: FlickAutoHideChild(
                   showIfVideoNotInitialized: false,
+                  autoHide: false,
                   child: Align(
                     alignment: Alignment.topRight,
                     child: Container(
@@ -42,6 +44,7 @@ class PortraitControls extends StatelessWidget {
                   ),
                 ),
               ),
+              /* Fullscreen toggle in center of screen and seek */
               Expanded(
                 child: FlickAutoHideChild(
                   showIfVideoNotInitialized: false,
@@ -50,12 +53,16 @@ class PortraitControls extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: FlickToggleSoundAction(
                       toggleMute: () {
+                        bool isPlaying =
+                            flickManager?.flickVideoManager?.isPlaying ?? false;
+                        if (!isPlaying) {
+                          Scrollable.ensureVisible(context);
+                        }
                         if (flickManager?.flickControlManager?.isMute ??
                             false) {
                           flickMultiManager?.toggleMute();
                         }
-                        flickManager?.flickControlManager
-                            ?.seekTo(Duration.zero);
+                        flickMultiManager?.replay(flickManager);
                         flickManager?.flickControlManager?.enterFullscreen();
                       },
                       child: const FlickSeekVideoAction(),
@@ -63,10 +70,11 @@ class PortraitControls extends StatelessWidget {
                   ),
                 ),
               ),
+              /* Mute button */
               Padding(
                 padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
                 child: FlickAutoHideChild(
-                  autoHide: true,
+                  autoHide: false,
                   showIfVideoNotInitialized: false,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -86,29 +94,31 @@ class PortraitControls extends StatelessWidget {
                   ),
                 ),
               ),
-              FlickAutoHideChild(
-                showIfVideoNotInitialized: false,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: FlickVideoProgressBar(
-                    flickProgressBarSettings: FlickProgressBarSettings(
-                      height: 5,
-                      padding: EdgeInsets.zero,
-                      handleRadius: 0,
-                      curveRadius: 0,
-                      backgroundColor: Colors.white24,
-                      bufferedColor: barColor.withAlpha(100),
-                      playedColor: barColor,
-                      handleColor: barColor,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
+          /* Buffering progress circle */
           const Center(
             child: FlickVideoBuffer(),
-          )
+          ),
+          /* Video progress */
+          FlickAutoHideChild(
+            showIfVideoNotInitialized: false,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: FlickVideoProgressBar(
+                flickProgressBarSettings: FlickProgressBarSettings(
+                  height: 5,
+                  padding: EdgeInsets.zero,
+                  handleRadius: 0,
+                  curveRadius: 0,
+                  backgroundColor: Colors.white24,
+                  bufferedColor: barColor.withAlpha(100),
+                  playedColor: barColor,
+                  handleColor: barColor,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
