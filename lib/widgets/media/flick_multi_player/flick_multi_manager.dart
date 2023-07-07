@@ -57,6 +57,21 @@ class FlickMultiManager {
     _activeManager?.flickControlManager?.play();
   }
 
+  replay([FlickManager? flickManager]) {
+    if (flickManager != null) {
+      _activeManager?.flickControlManager?.pause();
+      _activeManager = flickManager;
+    }
+
+    if (_isMute) {
+      _activeManager?.flickControlManager?.mute();
+    } else {
+      _activeManager?.flickControlManager?.unmute();
+    }
+
+    _activeManager?.flickControlManager?.replay();
+  }
+
   toggleMute() {
     _activeManager?.flickControlManager?.toggleMute();
     _isMute = _activeManager?.flickControlManager?.isMute ?? false;
