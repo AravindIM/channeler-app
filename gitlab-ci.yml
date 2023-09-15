@@ -1,0 +1,291 @@
+workflow:                                                                   # Controls entire pipeline
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'                      # Allow running on events related to merge requests
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Allow running when untagged commits are pushed or merged to the default branch
+
+stages:
+- test
+- build
+- release
+
+
+flutter-analyze:
+  stage: test
+  environment: test
+  image: ghcr.io/cirruslabs/flutter:stable
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'                      # Run job on events related to merge requests
+      when: manual
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+      when: manual
+  allow_failure: true
+  needs: []
+  before_script:
+    - flutter pub get
+  script:
+    - flutter analyze
+
+
+code-quality:
+  stage: test
+  environment: test
+  image: ghcr.io/cirruslabs/flutter:stable
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'                      # Run job on events related to merge requests
+      when: manual
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+      when: manual
+  allow_failure: true
+  needs: []
+  before_script:
+    - flutter pub global activate dart_code_metrics
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+  script:
+    - metrics lib -r codeclimate  > gl-code-quality-report.json
+  artifacts:
+    name: gl-code-quality-report
+    reports:
+      codequality: gl-code-quality-report.json
+
+
+flutter-test:
+  stage: test
+  environment: test
+  image: ghcr.io/cirruslabs/flutter:stable
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'                      # Run job on events related to merge requests
+      when: manual
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+      when: manual
+  allow_failure: true
+  needs: []
+  before_script:
+    - flutter pub global activate junitreport
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+  script:
+    - flutter test --machine --coverage | tojunit -o report.xml
+    - lcov --summary coverage/lcov.info
+    - genhtml coverage/lcov.info --output=coverage
+  coverage: '/lines\.*: \d+\.\d+\%/'
+  artifacts:
+    name: coverage
+    paths:
+      - $CI_PROJECT_DIR/coverage
+    reports:
+      junit: report.xml
+
+
+bump-version:
+  stage: build
+  environment: release
+  image: alpine:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+  needs: []
+  variables:
+    INITIAL_VERSION: '0.0.1'
+    GIT_STRATEGY: clone
+    GIT_DEPTH: "0"
+    GIT_CHECKOUT: "true"
+  script:
+    - |
+      apk add git
+      apk add curl
+      apk add jq
+      
+      if [ -z "$(git tag)" ]; then
+        OLD_RELEASE_VERSION="${INITIAL_VERSION}"
+        RELEASE_VERSION="${INITIAL_VERSION}"
+      else
+        # Extract version triplet from previous tag
+        OLD_RELEASE_VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+        MAJOR=$(echo "${OLD_RELEASE_VERSION}" | awk -F '.' '{print $1}')
+        MINOR=$(echo "${OLD_RELEASE_VERSION}" | awk -F '.' '{print $2}')
+        PATCH=$(echo "${OLD_RELEASE_VERSION}" | awk -F '.' '{print $3}')
+
+        # Get merge request for current commit hash
+        MERGE_REQUEST=$(curl --header "JOB-TOKEN: $CI_JOB_TOKEN" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/merge_requests")
+
+        API_ERROR=$(echo $MERGE_REQUEST | jq 'try .error')
+
+        # Check if the api access had errors
+        if [ ! -z "$API_ERROR" ]; then
+          echo "[ERROR]: $API_ERROR!"
+          echo "[ERROR]: Halting Release!!!!"
+          exit 1
+        fi
+
+        # If direct push to default branch
+        if [ "$MERGE_REQUEST" = "[]" ]; then
+          echo "[ERROR]: No Merge Request found for commit ${CI_COMMIT_SHA}!"
+          echo "[ERROR]: Halting Release!!!!"
+          exit 1
+        fi
+        
+        # Parse json for first (0th) merge request related to commit for labels and output true or false
+        BUMP_MAJOR=$(echo $MERGE_REQUEST | jq '.[0].labels | any(index("bump-major"))')
+        BUMP_MINOR=$(echo $MERGE_REQUEST | jq '.[0].labels | any(index("bump-minor"))')
+
+        if [ "$BUMP_MAJOR" = "true" ]; then
+          MAJOR=$((MAJOR + 1))
+          MINOR=0
+          PATCH=0
+        elif [ "$BUMP_MINOR" = "true" ]; then
+          MINOR=$((MINOR + 1))
+          PATCH=0
+        else
+          PATCH=$((PATCH + 1))
+        fi
+        
+        # Combine version triplets
+        RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+      fi
+      echo "[INFO]: Versioning Completed...!"
+      echo "[INFO]: OLD_RELEASE_VERSION=${OLD_RELEASE_VERSION}"
+      echo "[INFO]: RELEASE_VERSION=${RELEASE_VERSION}"
+
+      echo "OLD_RELEASE_VERSION=${OLD_RELEASE_VERSION}" >> release.env
+      echo "RELEASE_VERSION=${RELEASE_VERSION}" >> release.env
+  artifacts:
+    name: "$CI_JOB_NAME"
+    reports:
+      dotenv: release.env
+
+build-apk:
+  stage: build
+  environment: release
+  image: ghcr.io/cirruslabs/flutter:stable
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'
+      when: manual                                                          # Allow running from web event
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+      when: manual
+  before_script:
+    - flutter pub get
+  script:
+    - flutter build apk --split-per-abi --release
+  artifacts:
+    name: "$CI_JOB_NAME"
+    when: on_success
+    paths:
+      - ./build/app/outputs/flutter-apk/*.apk
+
+
+publish-packages:
+  stage: release
+  environment: release
+  image: curlimages/curl:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+  needs:
+    - job: build-apk
+      artifacts: true
+    - job: bump-version
+      artifacts: true
+  script:
+    - apk_paths=$(ls ./build/app/outputs/flutter-apk/*.apk)
+    - |
+      for apk_path in $apk_paths
+      do
+        apk_filename=$(basename $apk_path)
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $apk_path "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_PROJECT_NAME}/${RELEASE_VERSION}/${apk_filename}"
+      done
+
+release-notes:
+  stage: release
+  environment: release
+  image: alpine:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                  # Allow running from web event
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+  needs:
+    - job: bump-version
+      artifacts: true
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: "0"
+    GIT_CHECKOUT: "true"
+  script:
+    - |
+      apk add git
+      apk add curl
+      apk add jq
+
+      MERGE_REQUEST_API="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/commits/{}/merge_requests"
+      MERGE_COMMITS=$(git log --merges --format=%H v${OLD_RELEASE_VERSION}...$HEAD)
+
+      # Formats
+      BULLET_FORMAT='- \\(.title) ([#\\(.iid)](\\(.web_url)))'
+      SECTION_FORMAT='\n## \(.key)\n\(.value)'
+      RELEASE_NOTES_FORMAT='# Whats new\n\(.)'
+
+      # Filters
+      COMBINE_FILTER="add"
+
+      BULLET_FILTER="\\\"$BULLET_FORMAT\\\""
+
+      BODY_FILTER_ARGS='$ARGS.named | to_entries | map("\"\(.key)\": map(select(.labels | contains(\(.value))) | '"$BULLET_FILTER"')") | "{" + join (",") + "}"'
+
+      BODY_FILTER=$(jq -n -r -c \
+                    --argjson 'New Features' '["enhancement"]' \
+                    --argjson 'Bug Fixes' '["bug"]' \
+                    --argjson 'Maintenance' '["documentation"]' \
+                    "$BODY_FILTER_ARGS")
+
+      PREPROCESS_FILTER='with_entries(select(.value!=[])) | to_entries'
+
+      SECTION_FILTER='map(.value=(.value | join("\n"))) | map("'$SECTION_FORMAT'")'
+
+      RELEASE_NOTES_FILTER='join("\n") | "'$RELEASE_NOTES_FORMAT'"'
+
+      # Release Notes
+      RELEASE_NOTES=$(echo "$MERGE_COMMITS" | xargs -I {} curl -s "$MERGE_REQUEST_API" | jq -s -r "$COMBINE_FILTER | $BODY_FILTER | $PREPROCESS_FILTER | $SECTION_FILTER | $RELEASE_NOTES_FILTER")
+      
+      echo "[INFO]: RELEASE_NOTES:"
+      echo "${RELEASE_NOTES}"
+
+      echo "${RELEASE_NOTES}" >> release.md
+  artifacts:
+    name: "$CI_JOB_NAME"
+    when: on_success
+    paths:
+      - release.md
+
+publish-release:
+  stage: release
+  environment: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web'                                      # Allow running from web event
+      when: manual
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null # Run this job when untagged commits are pushed or merged to the default branch
+      when: manual
+  needs:
+    - job: build-apk
+      artifacts: true
+    - job: publish-packages
+      artifacts: false
+    - job: bump-version
+      artifacts: true
+    - job: release-notes
+      artifacts: true
+  script:
+    - echo "Creating release for ${CI_PROJECT_TITLE} v${RELEASE_VERSION}"
+    - |
+      args=""
+      for apk_path in ./build/app/outputs/flutter-apk/*.apk
+      do
+        apk_filename=$(basename "$apk_path")
+        args="${args}"' --assets-link '"'{\"name\":\"${apk_filename}\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_PROJECT_NAME}/${RELEASE_VERSION}/${apk_filename}\"}'"
+      done
+      RELEASE_NOTES=$(cat release.md)
+      echo "${args}" | xargs release-cli create --name "${CI_PROJECT_TITLE} v${RELEASE_VERSION}" --description "${RELEASE_NOTES}" --tag-name "v${RELEASE_VERSION}"
