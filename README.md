@@ -1,7 +1,7 @@
 # Channeler App
 Flutter Client for Image Board Socials.
 
-<img alt="Channeler App Logo" src="./assets/icon/icon_border.png" style="height:50px;width:50px"/>
+<img alt="Channeler App Logo" src="./assets/icon/icon_border.png" width="120" height="120"/>
 
 ## Releases
 Please check the releases section for downloading the apk for the app. If you rather build
