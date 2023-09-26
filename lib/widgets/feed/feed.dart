@@ -1,6 +1,6 @@
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
-import 'package:channeler/backend/thread.dart';
+import 'package:channeler/backend/post.dart';
 import 'package:channeler/widgets/feed/feed_card.dart';
 import 'package:channeler/widgets/media/flick_multi_player/flick_multi_manager.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,8 @@ class Feed extends StatefulWidget {
 }
 
 class _FeedState extends State<Feed> {
-  final PagingController<int, Thread> _pagingController =
-      PagingController(firstPageKey: 1);
+  final PagingController<int, Post> _pagingController =
+      PagingController(firstPageKey: 0);
   late FlickMultiManager flickMultiManager;
 
   @override
@@ -34,7 +34,7 @@ class _FeedState extends State<Feed> {
       Backend backend, String boardName, int pageKey) async {
     try {
       final Board board = backend.findBoardByName(boardName);
-      final List<Thread> newItems = await backend.fetchPage(boardName, pageKey);
+      final List<Post> newItems = await backend.fetchPage(boardName, pageKey);
       final isLastPage =
           newItems.length < board.threadsPerPage || pageKey == board.pages;
       if (isLastPage) {
@@ -65,14 +65,14 @@ class _FeedState extends State<Feed> {
       },
       child: RefreshIndicator(
         onRefresh: () => Future.sync(() => _pagingController.refresh()),
-        child: PagedListView<int, Thread>(
+        child: PagedListView<int, Post>(
           padding: EdgeInsets.zero,
           pagingController: _pagingController,
           builderDelegate: PagedChildBuilderDelegate(
-            itemBuilder: (context, Thread item, index) {
+            itemBuilder: (context, Post item, index) {
               return FeedCard(
                 backend: widget.backend,
-                thread: item,
+                post: item,
                 board: widget.board,
                 flickMultiManager: flickMultiManager,
               );

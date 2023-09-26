@@ -1,6 +1,6 @@
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
-import 'package:channeler/backend/thread.dart';
+import 'package:channeler/backend/post.dart';
 import 'package:channeler/widgets/feed/feed_card_text_body.dart';
 import 'package:channeler/widgets/feed/feed_card_footer.dart';
 import 'package:channeler/widgets/feed/feed_card_header.dart';
@@ -11,12 +11,12 @@ import 'package:flutter/material.dart';
 class FeedCard extends StatefulWidget {
   const FeedCard({
     super.key,
-    required this.thread,
+    required this.post,
     required this.board,
     required this.backend,
     required this.flickMultiManager,
   });
-  final Thread thread;
+  final Post post;
   final Board board;
   final Backend backend;
   final FlickMultiManager flickMultiManager;
@@ -31,9 +31,8 @@ class _FeedCardState extends State<FeedCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final Thread thread = widget.thread;
+    final Post post = widget.post;
     final board = widget.board;
-    final post = thread.post;
     final backend = widget.backend;
     final String attachment = post.attachment ?? '';
 
