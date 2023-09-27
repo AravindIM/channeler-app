@@ -39,7 +39,7 @@ void main() {
         headers: {'Accept': 'application/json'});
     if (response.statusCode == 200) {
       final pages = jsonDecode(response.body) as List<dynamic>;
-      final threadList = backend.getThreadList(pages, 0);
+      final threadList = backend.getThreadList(pages, 1);
       assert(threadList.isNotEmpty);
 
       final response2 = await http.get(api.getThreadUri("g", threadList[0]),
@@ -59,7 +59,7 @@ void main() {
   test("Parsing Page", () async {
     final backend = Backend();
     try {
-      final threads = await backend.fetchPage("g", 0);
+      final threads = await backend.fetchPage("g", 1);
       assert(threads.isNotEmpty);
     } catch (e) {
       return Future.error(

@@ -49,6 +49,8 @@ class Backend {
   }
 
   List<int> getThreadList(List<dynamic> pages, int pageNum) {
+    pageNum--;
+
     final page = pages[pageNum] as Map<String, dynamic>;
     final threadList = page['threads'] as List<dynamic>;
 
@@ -60,7 +62,7 @@ class Backend {
 
   Future<List<Post>> fetchPage(String boardName, int pageNum) async {
     try {
-      if (pageList.isEmpty || pageNum == 0) {
+      if (pageList.isEmpty || pageNum == 1) {
         final response = await http.get(api.getThreadListUri(boardName),
             headers: {'Accept': 'application/json'});
         if (response.statusCode == 200) {

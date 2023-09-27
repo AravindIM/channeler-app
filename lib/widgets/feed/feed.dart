@@ -18,7 +18,7 @@ class Feed extends StatefulWidget {
 
 class _FeedState extends State<Feed> {
   final PagingController<int, Post> _pagingController =
-      PagingController(firstPageKey: 0);
+      PagingController(firstPageKey: 1);
   late FlickMultiManager flickMultiManager;
 
   @override
