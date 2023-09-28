@@ -1,15 +1,16 @@
-import 'dart:convert';
-
 import 'package:channeler/backend/board.dart';
-import 'package:channeler/backend/post.dart';
+import 'package:channeler/backend/paginator.dart';
+import 'package:channeler/backend/session.dart';
 import 'package:http/http.dart' as http;
 import 'package:channeler/backend/api_endpoint.dart';
-import 'package:channeler/backend/backend.dart';
+import 'package:channeler/backend/backend.dart' as backend;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final session = Session(api: ApiEndpoint.for4chan());
+
   test("API Uri Generation", () {
-    final api = ApiEndpoint.for4chan();
+    final api = session.api;
     final boardsUri = api.getBoardsUri();
     expect(boardsUri.toString(), "https://a.4cdn.org/boards.json");
     final threadListUri = api.getThreadListUri("g");
@@ -19,7 +20,7 @@ void main() {
   });
 
   test("Parsing Boards", () async {
-    final api = ApiEndpoint.for4chan();
+    final api = session.api;
 
     final response = await http
         .get(api.getBoardsUri(), headers: {'Accept': 'application/json'});
@@ -31,40 +32,30 @@ void main() {
     }
   });
 
-  test("Parsing Threads", () async {
-    final api = ApiEndpoint.for4chan();
-    final backend = Backend();
+  test("Parsing Catalog", () async {
+    CatalogPaginator cataloguePaginator = CatalogPaginator(boardName: "g");
 
-    final response = await http.get(api.getThreadListUri("g"),
-        headers: {'Accept': 'application/json'});
-    if (response.statusCode == 200) {
-      final pages = jsonDecode(response.body) as List<dynamic>;
-      final threadList = backend.getThreadList(pages, 1);
-      assert(threadList.isNotEmpty);
+    backend.refreshPaginator(session, cataloguePaginator);
 
-      final response2 = await http.get(api.getThreadUri("g", threadList[0]),
-          headers: {'Accept': 'application/json'});
+    final cid = cataloguePaginator.getPage(1)[0];
 
-      if (response2.statusCode == 200) {
-        final json = jsonDecode(response2.body) as Map<String, dynamic>;
-        final _ = Post.fromThreadJson(json);
-      } else {
-        return Future.error('Failed to parse thread!');
-      }
-    } else {
-      return Future.error('Failed to parse threads list!');
-    }
+    backend.fetchPost(session, cataloguePaginator.getBoardName(), cid);
   });
 
-  test("Parsing Page", () async {
-    final backend = Backend();
-    try {
-      final threads = await backend.fetchPage("g", 1);
-      assert(threads.isNotEmpty);
-    } catch (e) {
-      return Future.error(
-          'Failed to parse page for board /g/: ${e.toString()}');
-    }
+  test("Parsing Threads", () async {
+    CatalogPaginator cataloguePaginator = CatalogPaginator(boardName: "g");
+
+    backend.refreshPaginator(session, cataloguePaginator);
+
+    final cid = cataloguePaginator.getPage(1)[0];
+
+    ThreadPaginator threadPaginator = ThreadPaginator(boardName: "g", id: cid);
+
+    backend.refreshPaginator(session, threadPaginator);
+
+    final tid = threadPaginator.getPage(1)[0];
+
+    backend.fetchPost(session, threadPaginator.getBoardName(), tid);
   });
 
   // test("Parsing Pages", () async {
