@@ -1,4 +1,4 @@
-import 'package:channeler/routes/board_page.dart';
+import 'package:channeler/routes/catalog_page.dart';
 import 'package:channeler/routes/home_page.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,7 +11,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/board/:name',
       builder: (context, state) =>
-          BoardPage(name: state.pathParameters['name']!),
+          CatalogPage(name: state.pathParameters['name']!),
     ),
   ],
 );

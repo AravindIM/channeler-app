@@ -161,4 +161,10 @@ class Post {
         replyCount: json['replies'] ?? 0,
         pinned: (json['sticky'] ?? 0) != 0);
   }
+
+  factory Post.fromThreadJson(Map<String, dynamic> json) {
+    final posts = json['posts'] as List<dynamic>;
+    final firstPost = posts[0] as Map<String, dynamic>;
+    return Post.fromJson(firstPost);
+  }
 }

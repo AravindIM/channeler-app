@@ -1,6 +1,6 @@
+import 'package:channeler/backend/session.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +15,9 @@ class BoardListView extends StatefulWidget {
 class _BoardListViewState extends State<BoardListView> {
   @override
   Widget build(BuildContext context) {
-    final backend = Provider.of<Backend>(context);
+    final session = Provider.of<Session>(context);
     return FutureBuilder<List<Board>>(
-      future: backend.fetchBoards(),
+      future: session.getBoards(),
       builder: (context, snapshot) {
         List<Widget> children = [];
         if (snapshot.hasData) {

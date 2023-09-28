@@ -1,4 +1,5 @@
-import 'package:channeler/backend/backend.dart';
+import 'package:channeler/backend/api_endpoint.dart';
+import 'package:channeler/backend/session.dart';
 import 'package:channeler/router.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,8 @@ void main() async {
 
   await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 1));
   runApp(
-    Provider<Backend>(
-      create: (_) => Backend(),
+    Provider<Session>(
+      create: (_) => Session(api: ApiEndpoint.for4chan()),
       child: const MyApp(),
     ),
   );
