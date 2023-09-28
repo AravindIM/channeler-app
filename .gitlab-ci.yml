@@ -9,6 +9,8 @@ stages:
 - build
 - release
 
+variables:
+  GIT_DEPTH: 0
 
 flutter-analyze:
   stage: test
