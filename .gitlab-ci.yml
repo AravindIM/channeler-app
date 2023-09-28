@@ -163,6 +163,8 @@ build-apk:
   stage: build
   environment: release
   image: ghcr.io/cirruslabs/flutter:stable
+  variables:
+    SECURE_FILES_DOWNLOAD_PATH: './android/'
   rules:
     - if: $CI_PIPELINE_SOURCE == 'web'
       when: manual                                                          # Allow running from web event
@@ -170,6 +172,7 @@ build-apk:
       when: manual
   before_script:
     - flutter pub get
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
   script:
     - flutter build apk --split-per-abi --release
   artifacts:
@@ -177,7 +180,6 @@ build-apk:
     when: on_success
     paths:
       - ./build/app/outputs/flutter-apk/*.apk
-
 
 publish-packages:
   stage: release
