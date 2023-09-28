@@ -1,6 +1,8 @@
-import 'package:channeler/backend/backend.dart';
+import 'package:channeler/backend/backend.dart' as backend;
 import 'package:channeler/backend/board.dart';
+import 'package:channeler/backend/paginator.dart';
 import 'package:channeler/backend/post.dart';
+import 'package:channeler/backend/session.dart';
 import 'package:channeler/widgets/feed/feed_card.dart';
 import 'package:channeler/widgets/media/flick_multi_player/flick_multi_manager.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +10,15 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class Feed extends StatefulWidget {
-  const Feed({super.key, required this.backend, required this.board});
-  final Backend backend;
+  const Feed({
+    super.key,
+    required this.session,
+    required this.paginator,
+    required this.board,
+  });
+  final Session session;
   final Board board;
+  final Paginator paginator;
 
   @override
   State<Feed> createState() => _FeedState();
@@ -25,18 +33,17 @@ class _FeedState extends State<Feed> {
   void initState() {
     flickMultiManager = FlickMultiManager();
     _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(widget.backend, widget.board.name, pageKey);
+      _fetchPage(widget.session, widget.board.name, pageKey);
     });
     super.initState();
   }
 
   Future<void> _fetchPage(
-      Backend backend, String boardName, int pageKey) async {
+      Session session, String boardName, int pageKey) async {
     try {
-      final Board board = backend.findBoardByName(boardName);
-      final List<Post> newItems = await backend.fetchPage(boardName, pageKey);
-      final isLastPage =
-          newItems.length < board.threadsPerPage || pageKey == board.pages;
+      final List<Post> newItems =
+          await backend.fetchPage(session, widget.paginator, pageKey);
+      final isLastPage = pageKey == widget.paginator.getMaxPages();
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
@@ -71,7 +78,7 @@ class _FeedState extends State<Feed> {
           builderDelegate: PagedChildBuilderDelegate(
             itemBuilder: (context, Post item, index) {
               return FeedCard(
-                backend: widget.backend,
+                session: widget.session,
                 post: item,
                 board: widget.board,
                 flickMultiManager: flickMultiManager,

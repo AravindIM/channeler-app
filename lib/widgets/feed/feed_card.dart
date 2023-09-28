@@ -1,6 +1,6 @@
-import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/post.dart';
+import 'package:channeler/backend/session.dart';
 import 'package:channeler/widgets/feed/feed_card_text_body.dart';
 import 'package:channeler/widgets/feed/feed_card_footer.dart';
 import 'package:channeler/widgets/feed/feed_card_header.dart';
@@ -13,12 +13,12 @@ class FeedCard extends StatefulWidget {
     super.key,
     required this.post,
     required this.board,
-    required this.backend,
+    required this.session,
     required this.flickMultiManager,
   });
   final Post post;
   final Board board;
-  final Backend backend;
+  final Session session;
   final FlickMultiManager flickMultiManager;
 
   @override
@@ -33,7 +33,7 @@ class _FeedCardState extends State<FeedCard> {
     final colorScheme = Theme.of(context).colorScheme;
     final Post post = widget.post;
     final board = widget.board;
-    final backend = widget.backend;
+    final session = widget.session;
     final String attachment = post.attachment ?? '';
 
     return Card(
@@ -55,7 +55,7 @@ class _FeedCardState extends State<FeedCard> {
           if (attachment.isNotEmpty)
             MediaHandler(
               mediaUrl:
-                  backend.api.getAttachment(board.name, attachment).toString(),
+                  session.api.getAttachment(board.name, attachment).toString(),
               flickMultiManager: widget.flickMultiManager,
             ),
           if (attachment.isNotEmpty)
