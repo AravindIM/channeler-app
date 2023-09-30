@@ -18,7 +18,10 @@ class CatalogPage extends StatelessWidget {
     final title = board.title;
     final CatalogPaginator paginator = CatalogPaginator(boardName: name);
     return Scaffold(
-        drawer: SideMenu(currentBoard: name),
+        drawer: SideMenu(
+          session: Provider.of<Session>(context),
+          currentBoard: name,
+        ),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(

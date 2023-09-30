@@ -26,7 +26,10 @@ class _ThreadPageState extends State<ThreadPage> {
     final title = '>>${widget.id}';
     paginator = ThreadPaginator(boardName: widget.boardName, id: widget.id);
     return Scaffold(
-        drawer: SideMenu(currentBoard: widget.boardName),
+        drawer: SideMenu(
+          session: Provider.of<Session>(context),
+          currentBoard: widget.boardName,
+        ),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
