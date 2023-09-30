@@ -4,15 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:flutter/material.dart';
 
-class BoardListView extends StatefulWidget {
-  const BoardListView({super.key, required this.currentBoard});
+class BoardListView extends StatelessWidget {
   final String currentBoard;
+  final Session session;
 
-  @override
-  State<BoardListView> createState() => _BoardListViewState();
-}
+  const BoardListView({
+    super.key,
+    required this.session,
+    required this.currentBoard,
+  });
 
-class _BoardListViewState extends State<BoardListView> {
   @override
   Widget build(BuildContext context) {
     final session = Provider.of<Session>(context);
@@ -29,27 +30,35 @@ class _BoardListViewState extends State<BoardListView> {
           final colorScheme = Theme.of(context).colorScheme;
           final nsfwColor = colorScheme.error;
           children = [
-            ExpansionTile(
-              initiallyExpanded: true,
-              title: Text(
-                "General (SFW)",
-                style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w700),
+            PageStorage(
+              bucket: session.bucket,
+              child: ExpansionTile(
+                key: const PageStorageKey("SFWExpansionTile"),
+                initiallyExpanded: true,
+                title: Text(
+                  "General (SFW)",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700),
+                ),
+                children: _boardListTiles(context, sfwBoards),
               ),
-              children: _boardListTiles(context, sfwBoards),
             ),
-            ExpansionTile(
-              initiallyExpanded: false,
-              title: Text(
-                "Adult (NSFW 18+)",
-                style: TextStyle(
-                    fontSize: 16,
-                    color: nsfwColor,
-                    fontWeight: FontWeight.w700),
+            PageStorage(
+              bucket: session.bucket,
+              child: ExpansionTile(
+                key: const PageStorageKey("NSFWExpansionTile"),
+                initiallyExpanded: false,
+                title: Text(
+                  "Adult (NSFW 18+)",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: nsfwColor,
+                      fontWeight: FontWeight.w700),
+                ),
+                children: _boardListTiles(context, nsfwBoards),
               ),
-              children: _boardListTiles(context, nsfwBoards),
             ),
           ];
         } else if (snapshot.hasError) {
@@ -93,7 +102,7 @@ class _BoardListViewState extends State<BoardListView> {
         final onPrimary = colorScheme.onPrimary;
         final boardName = board.name;
         final boardTitle = board.title;
-        final bool isSelected = boardName == widget.currentBoard;
+        final bool isSelected = boardName == currentBoard;
         return ListTile(
           selected: isSelected,
           selectedTileColor: board.nsfw

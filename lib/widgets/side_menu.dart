@@ -1,9 +1,13 @@
+import 'package:channeler/backend/session.dart';
 import 'package:channeler/widgets/board_list_view.dart';
 import 'package:flutter/material.dart';
 
 class SideMenu extends StatelessWidget {
-  const SideMenu({super.key, required this.currentBoard});
   final String currentBoard;
+  final Session session;
+
+  const SideMenu(
+      {super.key, required this.session, required this.currentBoard});
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,7 @@ class SideMenu extends StatelessWidget {
             ),
           ),
           BoardListView(
+            session: session,
             currentBoard: currentBoard,
           )
         ],
