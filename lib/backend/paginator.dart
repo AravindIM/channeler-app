@@ -1,45 +1,47 @@
 import 'package:channeler/backend/post.dart';
-import 'package:flutter/foundation.dart';
 
 abstract interface class Paginator {
   String getBoardName();
   int getPageSize();
-  Future<List<Post>> getNextPage();
+  List<Post> getNextPage();
 }
 
 class CatalogPaginator implements Paginator {
   final String boardName;
-  Stream<Post> pages = const Stream<Post>.empty().asBroadcastStream();
+  Iterator<List<Post>> pages = <List<Post>>[].iterator;
   int pageSize = 10;
 
   CatalogPaginator({required this.boardName});
 
-  Stream<Post> generatePosts(List<dynamic> catalogJson) async* {
-    final List<dynamic> threadList = await compute(
-        (_) => catalogJson
-            .map((pageJson) {
-              final page = pageJson as Map<String, dynamic>;
-              final threadList = page['threads'] as List<dynamic>;
-              return threadList;
-            })
-            .expand((thread) => thread)
-            .toList(),
-        "");
-    final List<Post> postList = await compute(
-        (_) => threadList.map((postJson) => Post.fromJson(postJson)).toList(),
-        "");
-    for (var post in postList) {
-      yield post;
+  Iterable<List<Post>> generatePage(List<dynamic> catalogJson) sync* {
+    List<Post> page = [];
+    for (var pageJson in catalogJson) {
+      final pageMap = pageJson as Map<String, dynamic>;
+      final threadList = pageMap['threads'] as List<dynamic>;
+      for (var post in threadList) {
+        page.add(Post.fromJson(post));
+        if (page.length >= pageSize) {
+          yield page;
+          page = [];
+        }
+      }
+    }
+    if (page.isNotEmpty) {
+      yield page;
     }
   }
 
   void refreshFromCatalogJson(List<dynamic> catalogJson) {
-    pages = generatePosts(catalogJson).asBroadcastStream();
+    pages = generatePage(catalogJson).iterator;
   }
 
   @override
-  Future<List<Post>> getNextPage() async {
-    return pages.take(pageSize).toList();
+  List<Post> getNextPage() {
+    if (pages.moveNext()) {
+      return pages.current;
+    } else {
+      return [];
+    }
   }
 
   @override
@@ -56,28 +58,38 @@ class CatalogPaginator implements Paginator {
 class ThreadPaginator implements Paginator {
   final String boardName;
   final int id;
-  Stream<Post> pages = const Stream<Post>.empty().asBroadcastStream();
+  Iterator<List<Post>> pages = <List<Post>>[].iterator;
   int pageSize = 10;
 
   ThreadPaginator({required this.boardName, required this.id});
 
-  Stream<Post> generatePosts(Map<String, dynamic> threadJson) async* {
-    List<dynamic> postsJson = threadJson['posts'] as List<dynamic>;
-    final List<Post> postList = await compute(
-        (_) => postsJson.map((postJson) => Post.fromJson(postJson)).toList(),
-        "");
-    for (var post in postList) {
-      yield post;
+  Iterable<List<Post>> generatePosts(Map<String, dynamic> threadJson) sync* {
+    List<Post> page = [];
+    List<dynamic> posts = threadJson['posts'] as List<dynamic>;
+    for (var postJson in posts) {
+      final post = postJson as Map<String, dynamic>;
+      page.add(Post.fromJson(post));
+      if (page.length >= pageSize) {
+        yield page;
+        page = [];
+      }
+    }
+    if (page.isNotEmpty) {
+      yield page;
     }
   }
 
   void refreshFromThreadJson(Map<String, dynamic> catalogJson) {
-    pages = generatePosts(catalogJson).asBroadcastStream();
+    pages = generatePosts(catalogJson).iterator;
   }
 
   @override
-  Future<List<Post>> getNextPage() async {
-    return pages.take(pageSize).toList();
+  List<Post> getNextPage() {
+    if (pages.moveNext()) {
+      return pages.current;
+    } else {
+      return [];
+    }
   }
 
   @override
