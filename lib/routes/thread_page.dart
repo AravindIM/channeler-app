@@ -23,7 +23,7 @@ class _ThreadPageState extends State<ThreadPage> {
   Widget build(BuildContext context) {
     final session = Provider.of<Session>(context);
     final board = session.findBoardByName(widget.boardName);
-    final title = 'Thread - #${widget.id}';
+    final title = '>>${widget.id}';
     paginator = ThreadPaginator(boardName: widget.boardName, id: widget.id);
     return Scaffold(
         drawer: SideMenu(currentBoard: widget.boardName),
