@@ -1,10 +1,12 @@
 import 'package:channeler/backend/api_endpoint.dart';
 import 'package:channeler/backend/backend.dart';
 import 'package:channeler/backend/board.dart';
+import 'package:flutter/material.dart';
 
 class Session {
   final ApiEndpoint api;
   List<Board> boards = [];
+  PageStorageBucket bucket = PageStorageBucket();
 
   Session({required this.api});
 
