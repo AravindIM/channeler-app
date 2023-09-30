@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/paginator.dart';
+import 'package:channeler/backend/post.dart';
 import 'package:channeler/backend/session.dart';
 import 'package:http/http.dart' as http;
 import 'package:channeler/backend/api_endpoint.dart';
-import 'package:channeler/backend/backend.dart' as backend;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -33,29 +35,61 @@ void main() {
   });
 
   test("Parsing Catalog", () async {
-    CatalogPaginator cataloguePaginator = CatalogPaginator(boardName: "g");
+    final api = session.api;
 
-    backend.refreshPaginator(session, cataloguePaginator);
+    final response = await http
+        .get(api.getCatalogUri("g"), headers: {'Accept': 'application/json'});
+    if (response.statusCode == 200) {
+      final catalogJson = jsonDecode(response.body);
 
-    final cid = cataloguePaginator.getPage(1)[0];
+      final CatalogPaginator cpager = CatalogPaginator(boardName: "g");
+      cpager.refreshFromCatalogJson(catalogJson);
 
-    backend.fetchPost(session, cataloguePaginator.getBoardName(), cid);
+      List<Post> cpage = await cpager.getNextPage();
+      assert(cpage.isNotEmpty);
+
+      cpage = await cpager.getNextPage();
+      assert(cpage.isNotEmpty);
+
+      cpage = await cpager.getNextPage();
+      assert(cpage.isNotEmpty);
+    } else {
+      return Future.error('Failed to fetch catalog!');
+    }
   });
 
   test("Parsing Threads", () async {
-    CatalogPaginator cataloguePaginator = CatalogPaginator(boardName: "g");
+    final api = session.api;
+    int id;
 
-    backend.refreshPaginator(session, cataloguePaginator);
+    final response = await http
+        .get(api.getCatalogUri("g"), headers: {'Accept': 'application/json'});
+    if (response.statusCode == 200) {
+      final catalogJson = jsonDecode(response.body);
 
-    final cid = cataloguePaginator.getPage(1)[0];
+      CatalogPaginator cpager = CatalogPaginator(boardName: "g");
+      cpager.refreshFromCatalogJson(catalogJson);
 
-    ThreadPaginator threadPaginator = ThreadPaginator(boardName: "g", id: cid);
+      List<Post> cpage = await cpager.getNextPage();
+      assert(cpage.isNotEmpty);
+      id = cpage[0].id;
+    } else {
+      return Future.error('Failed to fetch catalog!');
+    }
 
-    backend.refreshPaginator(session, threadPaginator);
+    final response2 = await http.get(api.getThreadUri("g", id),
+        headers: {'Accept': 'application/json'});
+    if (response.statusCode == 200) {
+      final threadJson = jsonDecode(response2.body);
 
-    final tid = threadPaginator.getPage(1)[0];
+      ThreadPaginator tpager = ThreadPaginator(boardName: "g", id: id);
+      tpager.refreshFromThreadJson(threadJson);
 
-    backend.fetchPost(session, threadPaginator.getBoardName(), tid);
+      List<Post> tpage = await tpager.getNextPage();
+      assert(tpage.isNotEmpty);
+    } else {
+      return Future.error('Failed to parse boards!');
+    }
   });
 
   // test("Parsing Pages", () async {
