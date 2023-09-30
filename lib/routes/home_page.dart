@@ -1,5 +1,7 @@
+import 'package:channeler/backend/session.dart';
 import 'package:channeler/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -14,7 +16,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      drawer: const SideMenu(
+      drawer: SideMenu(
+        session: Provider.of<Session>(context),
         currentBoard: '',
       ),
       body: NestedScrollView(
