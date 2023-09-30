@@ -55,9 +55,12 @@ class _FeedCardFooterState extends State<FeedCardFooter> {
               ],
             ),
             iconSize: iconSize,
-            onPressed: () {
-              context.push('/thread/${widget.board.name}/${widget.post.id}');
-            },
+            onPressed: widget.post.replyCount > 0
+                ? () {
+                    context
+                        .push('/thread/${widget.board.name}/${widget.post.id}');
+                  }
+                : null,
           ),
         ],
       ),
