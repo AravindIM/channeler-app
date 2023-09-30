@@ -44,9 +44,8 @@ class _FeedState extends State<Feed> {
       if (pageKey == 1) {
         await backend.refreshPaginator(widget.session, widget.paginator);
       }
-      final List<Post> newItems = await widget.paginator.getNextPage();
+      final List<Post> newItems = widget.paginator.getNextPage();
       final isLastPage = newItems.length < widget.paginator.getPageSize();
-      debugPrint(isLastPage ? "hit last page" : "pending pages");
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
@@ -54,7 +53,6 @@ class _FeedState extends State<Feed> {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      debugPrint(error.toString());
       _pagingController.error = error;
     }
   }
