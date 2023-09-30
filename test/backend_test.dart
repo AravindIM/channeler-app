@@ -45,13 +45,13 @@ void main() {
       final CatalogPaginator cpager = CatalogPaginator(boardName: "g");
       cpager.refreshFromCatalogJson(catalogJson);
 
-      List<Post> cpage = await cpager.getNextPage();
+      List<Post> cpage = cpager.getNextPage().toList();
       assert(cpage.isNotEmpty);
 
-      cpage = await cpager.getNextPage();
+      cpage = cpager.getNextPage().toList();
       assert(cpage.isNotEmpty);
 
-      cpage = await cpager.getNextPage();
+      cpage = cpager.getNextPage().toList();
       assert(cpage.isNotEmpty);
     } else {
       return Future.error('Failed to fetch catalog!');
@@ -70,7 +70,7 @@ void main() {
       CatalogPaginator cpager = CatalogPaginator(boardName: "g");
       cpager.refreshFromCatalogJson(catalogJson);
 
-      List<Post> cpage = await cpager.getNextPage();
+      List<Post> cpage = cpager.getNextPage().toList();
       assert(cpage.isNotEmpty);
       id = cpage[0].id;
     } else {
@@ -85,7 +85,7 @@ void main() {
       ThreadPaginator tpager = ThreadPaginator(boardName: "g", id: id);
       tpager.refreshFromThreadJson(threadJson);
 
-      List<Post> tpage = await tpager.getNextPage();
+      List<Post> tpage = tpager.getNextPage().toList();
       assert(tpage.isNotEmpty);
     } else {
       return Future.error('Failed to parse boards!');
