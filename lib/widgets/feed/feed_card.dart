@@ -68,7 +68,10 @@ class _FeedCardState extends State<FeedCard> {
           FeedCardTextBody(
               post: post, padding: const EdgeInsets.fromLTRB(20, 5, 20, 5)),
           FeedCardFooter(
-              post: post, padding: const EdgeInsets.fromLTRB(20, 5, 20, 5))
+            board: board,
+            post: post,
+            padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+          )
         ],
       ),
     );

@@ -1,9 +1,16 @@
+import 'package:channeler/backend/board.dart';
 import 'package:channeler/backend/post.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class FeedCardFooter extends StatefulWidget {
-  const FeedCardFooter({super.key, required this.post, required this.padding});
+  const FeedCardFooter(
+      {super.key,
+      required this.board,
+      required this.post,
+      required this.padding});
   final Post post;
+  final Board board;
   final EdgeInsets padding;
 
   @override
@@ -48,7 +55,9 @@ class _FeedCardFooterState extends State<FeedCardFooter> {
               ],
             ),
             iconSize: iconSize,
-            onPressed: () {},
+            onPressed: () {
+              context.push('/thread/${widget.board.name}/${widget.post.id}');
+            },
           ),
         ],
       ),
