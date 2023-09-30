@@ -41,9 +41,11 @@ class _FeedState extends State<Feed> {
   Future<void> _fetchPage(
       Session session, String boardName, int pageKey) async {
     try {
-      final List<Post> newItems =
-          await backend.fetchPage(session, widget.paginator, pageKey);
-      final isLastPage = pageKey == widget.paginator.getMaxPages();
+      if (pageKey == 1) {
+        await backend.refreshPaginator(widget.session, widget.paginator);
+      }
+      final List<Post> newItems = widget.paginator.getNextPage();
+      final isLastPage = newItems.length < widget.paginator.getPageSize();
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {

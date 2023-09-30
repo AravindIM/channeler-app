@@ -1,35 +1,47 @@
+import 'package:channeler/backend/post.dart';
+
 abstract interface class Paginator {
   String getBoardName();
-  int getMaxPages();
-  List<int> getPage(int pageNum);
+  int getPageSize();
+  List<Post> getNextPage();
 }
 
 class CatalogPaginator implements Paginator {
   final String boardName;
-  List<int> threads = [];
+  Iterator<List<Post>> pages = <List<Post>>[].iterator;
   int pageSize = 10;
 
   CatalogPaginator({required this.boardName});
 
-  void refreshFromThreadListJson(List<dynamic> threadListJson) {
-    threads = threadListJson
-        .map((pageJson) {
-          final page = pageJson as Map<String, dynamic>;
-          final pageThreads = page['threads'] as List<dynamic>;
-          return pageThreads.map((json) {
-            final entry = json as Map<String, dynamic>;
-            return entry['no'] as int;
-          });
-        })
-        .toList()
-        .expand((element) => element)
-        .toList();
+  Iterable<List<Post>> generatePage(List<dynamic> catalogJson) sync* {
+    List<Post> page = [];
+    for (var pageJson in catalogJson) {
+      final pageMap = pageJson as Map<String, dynamic>;
+      final threadList = pageMap['threads'] as List<dynamic>;
+      for (var post in threadList) {
+        page.add(Post.fromJson(post));
+        if (page.length >= pageSize) {
+          yield page;
+          page = [];
+        }
+      }
+    }
+    if (page.isNotEmpty) {
+      yield page;
+    }
+  }
+
+  void refreshFromCatalogJson(List<dynamic> catalogJson) {
+    pages = generatePage(catalogJson).iterator;
   }
 
   @override
-  int getMaxPages() {
-    var pagecount = threads.length / pageSize;
-    return pagecount.ceil();
+  List<Post> getNextPage() {
+    if (pages.moveNext()) {
+      return pages.current;
+    } else {
+      return [];
+    }
   }
 
   @override
@@ -38,31 +50,46 @@ class CatalogPaginator implements Paginator {
   }
 
   @override
-  List<int> getPage(int pageNum) {
-    final start = (pageNum - 1) * pageSize;
-    int end = start + pageSize;
-    if (end > threads.length) {
-      end = threads.length;
-    }
-
-    return threads.sublist(start, end);
+  int getPageSize() {
+    return pageSize;
   }
 }
 
 class ThreadPaginator implements Paginator {
   final String boardName;
   final int id;
-  List<int> threads = [];
+  Iterator<List<Post>> pages = <List<Post>>[].iterator;
   int pageSize = 10;
 
   ThreadPaginator({required this.boardName, required this.id});
 
-  void refreshFromThreadJson(Map<String, dynamic> threadJson) {
+  Iterable<List<Post>> generatePosts(Map<String, dynamic> threadJson) sync* {
+    List<Post> page = [];
     List<dynamic> posts = threadJson['posts'] as List<dynamic>;
-    threads = posts.map((postJson) {
+    for (var postJson in posts) {
       final post = postJson as Map<String, dynamic>;
-      return post['no'] as int;
-    }).toList();
+      page.add(Post.fromJson(post));
+      if (page.length >= pageSize) {
+        yield page;
+        page = [];
+      }
+    }
+    if (page.isNotEmpty) {
+      yield page;
+    }
+  }
+
+  void refreshFromThreadJson(Map<String, dynamic> catalogJson) {
+    pages = generatePosts(catalogJson).iterator;
+  }
+
+  @override
+  List<Post> getNextPage() {
+    if (pages.moveNext()) {
+      return pages.current;
+    } else {
+      return [];
+    }
   }
 
   @override
@@ -71,19 +98,7 @@ class ThreadPaginator implements Paginator {
   }
 
   @override
-  int getMaxPages() {
-    var pagecount = threads.length / pageSize;
-    return pagecount.floor();
-  }
-
-  @override
-  List<int> getPage(int pageNum) {
-    final start = (pageNum - 1) * pageSize;
-    int end = start + pageSize;
-    if (end > threads.length) {
-      end = threads.length;
-    }
-
-    return threads.sublist(start, end);
+  int getPageSize() {
+    return pageSize;
   }
 }

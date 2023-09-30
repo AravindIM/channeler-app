@@ -6,19 +6,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 //convert to stateless widget
-class CatalogPage extends StatelessWidget {
-  final String name;
+class ThreadPage extends StatefulWidget {
+  final String boardName;
+  final int id;
 
-  const CatalogPage({super.key, required this.name});
+  const ThreadPage({super.key, required this.boardName, required this.id});
+
+  @override
+  State<ThreadPage> createState() => _ThreadPageState();
+}
+
+class _ThreadPageState extends State<ThreadPage> {
+  ThreadPaginator? paginator;
 
   @override
   Widget build(BuildContext context) {
     final session = Provider.of<Session>(context);
-    final board = session.findBoardByName(name);
-    final title = board.title;
-    final CatalogPaginator paginator = CatalogPaginator(boardName: name);
+    final board = session.findBoardByName(widget.boardName);
+    final title = '>>${widget.id}';
+    paginator = ThreadPaginator(boardName: widget.boardName, id: widget.id);
     return Scaffold(
-        drawer: SideMenu(currentBoard: name),
+        drawer: SideMenu(currentBoard: widget.boardName),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
@@ -28,7 +36,11 @@ class CatalogPage extends StatelessWidget {
               title: Text(title),
             ),
           ],
-          body: Feed(session: session, paginator: paginator, board: board),
+          body: Feed(
+            session: session,
+            paginator: paginator as ThreadPaginator,
+            board: board,
+          ),
         ));
   }
 }
