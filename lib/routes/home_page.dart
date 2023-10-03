@@ -1,5 +1,5 @@
 import 'package:channeler/backend/session.dart';
-import 'package:channeler/widgets/side_menu.dart';
+import 'package:channeler/widgets/boardmenu/boardmenu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      drawer: SideMenu(
+      drawer: BoardMenu(
         session: Provider.of<Session>(context),
         currentBoard: '',
       ),

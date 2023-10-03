@@ -1,7 +1,7 @@
 import 'package:channeler/backend/paginator.dart';
 import 'package:channeler/backend/session.dart';
+import 'package:channeler/widgets/boardmenu/boardmenu.dart';
 import 'package:channeler/widgets/feed/feed.dart';
-import 'package:channeler/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,7 @@ class _ThreadPageState extends State<ThreadPage> {
     final title = '>>${widget.id}';
     paginator = ThreadPaginator(boardName: widget.boardName, id: widget.id);
     return Scaffold(
-        drawer: SideMenu(
+        drawer: BoardMenu(
           session: Provider.of<Session>(context),
           currentBoard: widget.boardName,
         ),

@@ -1,7 +1,7 @@
 import 'package:channeler/backend/paginator.dart';
 import 'package:channeler/backend/session.dart';
+import 'package:channeler/widgets/boardmenu/boardmenu.dart';
 import 'package:channeler/widgets/feed/feed.dart';
-import 'package:channeler/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +18,7 @@ class CatalogPage extends StatelessWidget {
     final title = board.title;
     final CatalogPaginator paginator = CatalogPaginator(boardName: name);
     return Scaffold(
-        drawer: SideMenu(
+        drawer: BoardMenu(
           session: Provider.of<Session>(context),
           currentBoard: name,
         ),
