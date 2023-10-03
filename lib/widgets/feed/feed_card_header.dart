@@ -47,7 +47,7 @@ class FeedCardHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  post.username,
+                  "#${post.id}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -55,22 +55,38 @@ class FeedCardHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   softWrap: false,
                 ),
-                Text(
-                  timestamp,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.username,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
+                    const Spacer(flex: 1),
+                    Text(
+                      timestamp,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 2.0),
           post.pinned
               ? const Icon(Icons.push_pin, size: 20.0)
               : const SizedBox(
-                  width: 20.0,
+                  width: 1.0,
                 ),
         ],
       ),
