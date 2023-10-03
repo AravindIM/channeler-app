@@ -18,7 +18,7 @@ class FeedCardHeader extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final nsfwColor = colorScheme.error;
     final onNsfwColor = colorScheme.onError;
-    final String timestamp = timeago.format(post.timestamp);
+    final String timestamp = timeago.format(post.timestamp, locale: 'en_short');
     return Padding(
       padding: padding,
       child: Row(
