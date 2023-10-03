@@ -1,5 +1,4 @@
 import 'package:channeler/backend/session.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:channeler/backend/board.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ class BoardListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final session = Provider.of<Session>(context);
     return FutureBuilder<List<Board>>(
       future: session.getBoards(),
       builder: (context, snapshot) {
@@ -30,35 +28,29 @@ class BoardListView extends StatelessWidget {
           final colorScheme = Theme.of(context).colorScheme;
           final nsfwColor = colorScheme.error;
           children = [
-            PageStorage(
-              bucket: session.bucket,
-              child: ExpansionTile(
-                key: const PageStorageKey("SFWExpansionTile"),
-                initiallyExpanded: true,
-                title: Text(
-                  "General (SFW)",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700),
-                ),
-                children: _boardListTiles(context, sfwBoards),
+            ExpansionTile(
+              key: const PageStorageKey("SFWExpansionTile"),
+              initiallyExpanded: true,
+              title: Text(
+                "General (SFW)",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w700),
               ),
+              children: _boardListTiles(context, sfwBoards),
             ),
-            PageStorage(
-              bucket: session.bucket,
-              child: ExpansionTile(
-                key: const PageStorageKey("NSFWExpansionTile"),
-                initiallyExpanded: false,
-                title: Text(
-                  "Adult (NSFW 18+)",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: nsfwColor,
-                      fontWeight: FontWeight.w700),
-                ),
-                children: _boardListTiles(context, nsfwBoards),
+            ExpansionTile(
+              key: const PageStorageKey("NSFWExpansionTile"),
+              initiallyExpanded: false,
+              title: Text(
+                "Adult (NSFW 18+)",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: nsfwColor,
+                    fontWeight: FontWeight.w700),
               ),
+              children: _boardListTiles(context, nsfwBoards),
             ),
           ];
         } else if (snapshot.hasError) {

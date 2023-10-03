@@ -1,12 +1,12 @@
 import 'package:channeler/backend/session.dart';
-import 'package:channeler/widgets/board_list_view.dart';
+import 'package:channeler/widgets/boardmenu/board_list_view.dart';
 import 'package:flutter/material.dart';
 
-class SideMenu extends StatelessWidget {
+class BoardMenu extends StatelessWidget {
   final String currentBoard;
   final Session session;
 
-  const SideMenu(
+  const BoardMenu(
       {super.key, required this.session, required this.currentBoard});
 
   @override
@@ -46,10 +46,13 @@ class SideMenu extends StatelessWidget {
               ),
             ),
           ),
-          BoardListView(
-            session: session,
-            currentBoard: currentBoard,
-          )
+          PageStorage(
+            bucket: session.bucket,
+            child: BoardListView(
+              session: session,
+              currentBoard: currentBoard,
+            ),
+          ),
         ],
       ),
     );

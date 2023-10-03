@@ -11,14 +11,14 @@ class Session {
   Session({required this.api});
 
   Future<List<Board>> getBoards() async {
-    if (boards.isEmpty) {
-      try {
+    try {
+      if (boards.isEmpty) {
         boards = await fetchBoards(this);
-      } catch (e) {
-        Future.error(e.toString());
       }
+      return boards;
+    } catch (e) {
+      return Future.error(e.toString());
     }
-    return boards;
   }
 
   Board findBoardByName(String name) {
