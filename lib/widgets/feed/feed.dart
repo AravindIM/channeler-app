@@ -58,12 +58,6 @@ class _FeedState extends State<Feed> {
   }
 
   @override
-  void didUpdateWidget(Feed oldWidget) {
-    _pagingController.refresh();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
       key: ObjectKey(flickMultiManager),

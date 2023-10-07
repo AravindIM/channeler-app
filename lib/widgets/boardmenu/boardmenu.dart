@@ -47,7 +47,7 @@ class BoardMenu extends StatelessWidget {
             ),
           ),
           PageStorage(
-            bucket: session.bucket,
+            bucket: session.appBucket,
             child: BoardListView(
               session: session,
               currentBoard: currentBoard,

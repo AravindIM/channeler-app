@@ -117,6 +117,7 @@ class BoardListView extends StatelessWidget {
           ),
           title: Text(boardTitle),
           onTap: () {
+            session.resetPageBucket();
             context.go('/board/$boardName');
             context.pop();
           },
