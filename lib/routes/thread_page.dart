@@ -18,6 +18,8 @@ class ThreadPage extends StatelessWidget {
     final board = session.findBoardByName(boardName);
     final title = '>>$id';
     ThreadPaginator paginator = ThreadPaginator(boardName: boardName, id: id);
+    final pageKey = PageStorageKey<String>("/${board.name}/$id");
+
     return Scaffold(
         drawer: BoardMenu(
           session: Provider.of<Session>(context),
@@ -32,10 +34,14 @@ class ThreadPage extends StatelessWidget {
               title: Text(title),
             ),
           ],
-          body: Feed(
-            session: session,
-            paginator: paginator,
-            board: board,
+          body: PageStorage(
+            bucket: session.pageBucket,
+            child: Feed(
+              key: pageKey,
+              session: session,
+              paginator: paginator,
+              board: board,
+            ),
           ),
         ));
   }

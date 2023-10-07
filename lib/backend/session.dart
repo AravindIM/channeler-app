@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class Session {
   final ApiEndpoint api;
   List<Board> boards = [];
-  PageStorageBucket bucket = PageStorageBucket();
+  PageStorageBucket appBucket = PageStorageBucket();
+  PageStorageBucket pageBucket = PageStorageBucket();
 
   Session({required this.api});
 
@@ -19,6 +20,10 @@ class Session {
     } catch (e) {
       return Future.error(e.toString());
     }
+  }
+
+  void resetPageBucket() {
+    pageBucket = PageStorageBucket();
   }
 
   Board findBoardByName(String name) {

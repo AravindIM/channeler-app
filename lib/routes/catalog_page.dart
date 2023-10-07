@@ -16,7 +16,9 @@ class CatalogPage extends StatelessWidget {
     final session = Provider.of<Session>(context);
     final board = session.findBoardByName(name);
     final title = board.title;
+    final pageKey = PageStorageKey<String>("/${board.name}/");
     final CatalogPaginator paginator = CatalogPaginator(boardName: name);
+
     return Scaffold(
         drawer: BoardMenu(
           session: Provider.of<Session>(context),
@@ -31,7 +33,15 @@ class CatalogPage extends StatelessWidget {
               title: Text(title),
             ),
           ],
-          body: Feed(session: session, paginator: paginator, board: board),
+          body: PageStorage(
+            bucket: session.pageBucket,
+            child: Feed(
+              key: pageKey,
+              session: session,
+              paginator: paginator,
+              board: board,
+            ),
+          ),
         ));
   }
 }
