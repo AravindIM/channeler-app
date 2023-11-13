@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:channeler/backend/api_endpoint.dart';
 import 'package:channeler/backend/session.dart';
 import 'package:channeler/router.dart';
@@ -10,6 +11,8 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final savedThemeMode = await AdaptiveTheme.getThemeMode();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -19,13 +22,15 @@ void main() async {
   runApp(
     Provider<Session>(
       create: (_) => Session(api: ApiEndpoint.for4chan()),
-      child: MyApp(),
+      child: MyApp(savedThemeMode: savedThemeMode),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  MyApp({super.key, this.savedThemeMode});
+
+  final AdaptiveThemeMode? savedThemeMode;
 
   final lightTheme = FlexThemeData.light(
     scheme: FlexScheme.greenM3,
@@ -115,15 +120,19 @@ class MyApp extends StatelessWidget {
 // to let the device system mode control the theme mode:
 // themeMode: ThemeMode.system,
 
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Channeler',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: appRouter,
+    return AdaptiveTheme(
+      light: lightTheme,
+      dark: darkTheme,
+      initial: savedThemeMode ?? AdaptiveThemeMode.system,
+      debugShowFloatingThemeButton: true,
+      builder: (lightTheme, darkTheme) => MaterialApp.router(
+        title: 'Channeler',
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        routerConfig: appRouter,
+      ),
     );
   }
 }
